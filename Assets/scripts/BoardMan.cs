@@ -17,6 +17,7 @@ public class BoardMan : MonoBehaviour {
 
 	private enum Row {empty, npc, enemy};
 	private GameObject player;
+	//private float delayEndTurn = 0.5f; 
 
 	void Awake(){
 
@@ -131,7 +132,7 @@ public class BoardMan : MonoBehaviour {
 		SpawnRow(WhatTypeOfRow());
 	}
 
-	public int[] PLayerMove(int[] currentPos, Direction dir)
+	public int[] PlayerMove(int[] currentPos, Direction dir)
 	{
 		int [] newPositionGR = currentPos;
 				
