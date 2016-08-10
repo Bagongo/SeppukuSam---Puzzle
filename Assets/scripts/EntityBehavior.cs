@@ -21,18 +21,16 @@ public class EntityBehavior : MonoBehaviour {
 		items = boardMan.items;		
 	}
 
-	public void StartTurn()
+	public void RequestMove()
 	{
-		boardMan.RequestMove(currentPos, moveDirection);
+		boardMan.ElaborateMove(currentPos, moveDirection);
 	}
 
 	public void MoveEntity(int[] newPos)
 	{
 		currentPos = newPos;
 		transform.position = grid[currentPos[0], currentPos[1]].transform.position;	
-
-		if(canPickUp && !hasKnife && items[currentPos[0], currentPos[1]] != null)
-			LookForKnife();															
+		LookForKnife();															
 	}
 
 	public void LookForKnife()

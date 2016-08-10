@@ -70,7 +70,7 @@ public class BoardMan : MonoBehaviour {
 			return Row.empty;
 	}
 
-	void SpawnRow(Row whatTospawn)
+	void SpawnRow(Row whatTospawn) //consider delegating type of spawnable choice to other method or brand new spawner in game element...
 	{
 		Row whatToSpawn = whatTospawn;
 
@@ -110,33 +110,6 @@ public class BoardMan : MonoBehaviour {
 		}
 	}
 
-	public void PlayerMove(PlayerMoves move)
-	{
-		int[] pos = playerPos;
-									
-		switch(move)
-		{
-			case PlayerMoves.still:
-				break;
-			case PlayerMoves.knife:
-				KnifeImpact();
-				break;
-			case PlayerMoves.left:
-				pos = EvaluateMovement(playerPos, new int[]{-1, playerPos[1]});
-				break;
-			case PlayerMoves.right:
-				pos = EvaluateMovement(playerPos, new int[]{1, playerPos[1]});
-				break;
-		}
-
-		entities[playerPos[0], playerPos[1]] = null;
-		entities[pos[0], pos[1]] = player;
-		playerPos = pos;
-		player.GetComponent<EntityBehavior>().MoveEntity(pos);
-
-		EndTurn();
-	}
-
 	public void EndTurn()
 	{
 		for(int y=1; y<gridH; y++)
@@ -148,7 +121,7 @@ public class BoardMan : MonoBehaviour {
 					if(y == 1)
 						RemoveFromGrid(new int[]{x,y});
 					else						
-						entities[x,y].GetComponent<EntityBehavior>().StartTurn();
+						entities[x,y].GetComponent<EntityBehavior>().RequestMove();
 				}
 			}
 		}
@@ -157,7 +130,7 @@ public class BoardMan : MonoBehaviour {
 		SpawnRow(WhatTypeOfRow());
 	}
 
-	void KnifeImpact()
+	public void KnifeImpact()
 	{
 		int x = playerPos[0];
 
@@ -167,7 +140,7 @@ public class BoardMan : MonoBehaviour {
 
 			if(entities[x,i] != null)
 			{
-				RemoveFromGrid(pos);
+				RemoveFromGrid(pos); //should call method 'killSmething' once it's ready....
 				DropKnife(pos);	
 				break;
 			}
@@ -204,15 +177,15 @@ public class BoardMan : MonoBehaviour {
 		return newPos;
 	}
 
-	public void RequestMove(int[]pos, int[]dir)
+	public void ElaborateMove(int[]pos, int[]dir)
 	{
 		GameObject ent = entities[pos[0], pos[1]];
 		EntityBehavior entB = ent.GetComponent<EntityBehavior>();
 
 		int[] newPos = EvaluateMovement(pos, dir);
 
-		entities[newPos[0], newPos[1]] = ent;
 		entities[pos[0], pos[1]] = null;
+		entities[newPos[0], newPos[1]] = ent;
 
 		entB.MoveEntity(newPos);
 
@@ -227,7 +200,7 @@ public class BoardMan : MonoBehaviour {
 		if(entities[pos[0], pos[1]].GetComponent<EntityBehavior>().hasKnife  && entities[pos[0], pos[1]].GetComponent<EntityBehavior>().canDrop)
 		{
 			DropKnife(new int[] {pos[0], pos[1] - 1});
-			player.GetComponent<PlayerBehavior>().LookForKnife(); //put somewher in animation or else. Move the whole knifedropping at eliminate.........
+			player.GetComponent<PlayerBehavior>().LookForKnife(); //put somewhere in animation or else. Move the whole knifedropping at eliminate.........
 		}
 
 		Destroy(entities[pos[0], pos[1]].gameObject);

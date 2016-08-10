@@ -8,16 +8,35 @@ public class PlayerBehavior : EntityBehavior {
 	void Update () {
 
 		if(Input.GetKeyDown("left"))
-			boardMan.PlayerMove(PlayerMoves.left);
+			ParseCommand(PlayerMoves.left);
 		else if(Input.GetKeyDown("right"))
-			boardMan.PlayerMove(PlayerMoves.right);
+			ParseCommand(PlayerMoves.right);
 		else if (Input.GetKeyDown("space"))
-			boardMan.PlayerMove(PlayerMoves.still);
+			ParseCommand(PlayerMoves.still);
 		else if(Input.GetKeyDown("up") && hasKnife)
+			ParseCommand(PlayerMoves.knife);
+	}
+
+	void ParseCommand(PlayerMoves move)
+	{									
+		switch(move)
 		{
-			boardMan.PlayerMove(PlayerMoves.knife);
-			hasKnife = false;
+			case PlayerMoves.still:
+				break;
+			case PlayerMoves.knife:
+				hasKnife = false;				
+				boardMan.KnifeImpact();
+				break;
+			case PlayerMoves.left:
+				boardMan.ElaborateMove(currentPos, new int[]{-1, currentPos[1]});
+				break;
+			case PlayerMoves.right:
+				boardMan.ElaborateMove(currentPos, new int[]{1, currentPos[1]});
+				break;
 		}
+
+		boardMan.playerPos = currentPos;
+		boardMan.EndTurn();
 	}
 
 }
