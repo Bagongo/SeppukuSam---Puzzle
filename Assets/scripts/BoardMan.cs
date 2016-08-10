@@ -18,10 +18,11 @@ public class BoardMan : MonoBehaviour {
 	public int turnsAtSetup = 5;
 
 	private enum Row {empty, npc, enemy};
-	private GameObject player;
-	private GameObject entity;
-	private int[] enitityPos;
 	private GameObject knife;
+	private GameObject player; 
+
+//	private GameObject entity; use to trim down some of the parameter passing....
+//	private int[] enitityPos;
 
 	void Awake(){
 
@@ -45,16 +46,9 @@ public class BoardMan : MonoBehaviour {
 
 	void Start(){
 
-		for(int x=0; x<gridW; x++)
-		{
-			for(int y=0; y<gridH; y++)
-				Debug.Log(items[x,y]);
-
-		}
-
 		entities = new GameObject[gridW, gridH];
 
-		player = Instantiate(playerPrefab, grid[3,0].transform.position, Quaternion.identity) as GameObject;
+		player = Instantiate(playerPrefab, grid[playerPos[0], playerPos[1]].transform.position, Quaternion.identity) as GameObject;
 		entities[playerPos[0],playerPos[1]] = player;
 		player.GetComponent<PlayerBehavior>().currentPos = playerPos;
 
@@ -116,6 +110,33 @@ public class BoardMan : MonoBehaviour {
 		}
 	}
 
+	public void PlayerMove(PlayerMoves move)
+	{
+		int[] pos = playerPos;
+									
+		switch(move)
+		{
+			case PlayerMoves.still:
+				break;
+			case PlayerMoves.knife:
+				KnifeImpact();
+				break;
+			case PlayerMoves.left:
+				pos = EvaluateMovement(playerPos, new int[]{-1, playerPos[1]});
+				break;
+			case PlayerMoves.right:
+				pos = EvaluateMovement(playerPos, new int[]{1, playerPos[1]});
+				break;
+		}
+
+		entities[playerPos[0], playerPos[1]] = null;
+		entities[pos[0], pos[1]] = player;
+		playerPos = pos;
+		player.GetComponent<EntityBehavior>().MoveEntity(pos);
+
+		EndTurn();
+	}
+
 	public void EndTurn()
 	{
 		for(int y=1; y<gridH; y++)
@@ -125,51 +146,15 @@ public class BoardMan : MonoBehaviour {
 				if (entities[x,y] != null)
 				{
 					if(y == 1)
-						EliminateEntity(new int[]{x,y});
+						RemoveFromGrid(new int[]{x,y});
 					else						
-						EvaluateEntityMove(new int[]{x,y}, entities[x,y]);
+						entities[x,y].GetComponent<EntityBehavior>().StartTurn();
 				}
 			}
 		}
 
 		turnNmr++;
 		SpawnRow(WhatTypeOfRow());
-	}
-
-	public int[] PlayerMove(PlayerMoves dir)
-	{
-		int [] newPositionGR = playerPos;
-				
-		switch(dir)
-		{
-			case PlayerMoves.still:
-				newPositionGR = playerPos;
-				break;
-			case PlayerMoves.knife:
-				newPositionGR = playerPos;
-				KnifeImpact();
-				break;
-			case PlayerMoves.left:
-				if(playerPos[0] <= 0)
-					newPositionGR = playerPos;
-				else
-					newPositionGR[0] = playerPos[0]-1;
-				break;
-			case PlayerMoves.right:
-				if(playerPos[0] >= gridW-1)
-					newPositionGR = playerPos;
-				else
-					newPositionGR[0] = playerPos[0]+1;
-				break;
-		}
-
-		entities[playerPos[0], playerPos[1]] = null;
-		playerPos = new int[]{newPositionGR[0], newPositionGR[1]};
-		entities[playerPos[0], playerPos[1]] = player;
-
-		EndTurn();
-
-		return playerPos;							
 	}
 
 	void KnifeImpact()
@@ -182,7 +167,7 @@ public class BoardMan : MonoBehaviour {
 
 			if(entities[x,i] != null)
 			{
-				EliminateEntity(pos);
+				RemoveFromGrid(pos);
 				DropKnife(pos);	
 				break;
 			}
@@ -203,22 +188,33 @@ public class BoardMan : MonoBehaviour {
 		items[pos[0],pos[1]] = knife;	
 	}
 
-	public void EvaluateEntityMove(int[] pos, GameObject ent)
+	public int[] EvaluateMovement(int[]pos, int[]dir)
 	{
-		EntityBehavior entB = ent.GetComponent<EntityBehavior>();
-		int[] requestedPos = new int[]{pos[0]+entB.moveDirection[0], pos[1]+entB.moveDirection[1]};
+		int[] requestedPos = new int[]{pos[0]+dir[0], pos[1]+dir[1]};
+		int[] newPos;
 
-		if(entities[requestedPos[0], requestedPos[1]] == null)
-		{
-			entities[requestedPos[0], requestedPos[1]] = ent;
-			entities[pos[0], pos[1]] = null;
-			entB.MoveEntity(new int[] {requestedPos[0], requestedPos[1]});  
-		}
+		if((requestedPos[0] >= 0 && requestedPos[0] < gridW) && requestedPos[1] >= 0 && entities[requestedPos[0], requestedPos[1]] == null)
+			newPos = new int[] {requestedPos[0], requestedPos[1]};  
 		else
 		{
-			Debug.Log("invalid move requested by" + ent.name + "pos: " + pos[0] + " " + pos[1]);	
-			entB.MoveEntity(new int[] {pos[0], pos[1]});	
+			Debug.Log("invalid move - pos: " + pos[0] + " " + pos[1]);	
+			newPos = new int[] {pos[0], pos[1]};	
 		}
+
+		return newPos;
+	}
+
+	public void RequestMove(int[]pos, int[]dir)
+	{
+		GameObject ent = entities[pos[0], pos[1]];
+		EntityBehavior entB = ent.GetComponent<EntityBehavior>();
+
+		int[] newPos = EvaluateMovement(pos, dir);
+
+		entities[newPos[0], newPos[1]] = ent;
+		entities[pos[0], pos[1]] = null;
+
+		entB.MoveEntity(newPos);
 
 		if(ent.GetComponent<EnemyBehavior>())
 		{}
@@ -226,15 +222,17 @@ public class BoardMan : MonoBehaviour {
 		{}					
 	}
 
-	void EliminateEntity(int[] pos)
+	void RemoveFromGrid(int[] pos)
 	{
 		if(entities[pos[0], pos[1]].GetComponent<EntityBehavior>().hasKnife  && entities[pos[0], pos[1]].GetComponent<EntityBehavior>().canDrop)
+		{
 			DropKnife(new int[] {pos[0], pos[1] - 1});
+			player.GetComponent<PlayerBehavior>().LookForKnife(); //put somewher in animation or else. Move the whole knifedropping at eliminate.........
+		}
 
 		Destroy(entities[pos[0], pos[1]].gameObject);
 		entities[pos[0], pos[1]] = null;												
 	}
-
 
 	float Choose (float[] probs) 
 	{

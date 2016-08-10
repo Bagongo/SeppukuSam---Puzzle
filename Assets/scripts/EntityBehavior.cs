@@ -21,6 +21,11 @@ public class EntityBehavior : MonoBehaviour {
 		items = boardMan.items;		
 	}
 
+	public void StartTurn()
+	{
+		boardMan.RequestMove(currentPos, moveDirection);
+	}
+
 	public void MoveEntity(int[] newPos)
 	{
 		currentPos = newPos;
