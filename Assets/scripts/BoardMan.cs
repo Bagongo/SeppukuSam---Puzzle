@@ -57,7 +57,10 @@ public class BoardMan : MonoBehaviour {
 		SpawnRow(WhatTypeOfRow());
 
 		for(int i=0; i<=turnsAtSetup; i++)
-			EndTurn();
+		{
+			OtherEntitiesMove();
+			NextTurn();
+		}
 	}
 
 	Row WhatTypeOfRow()
@@ -110,7 +113,7 @@ public class BoardMan : MonoBehaviour {
 		}
 	}
 
-	public void EndTurn()
+	public void OtherEntitiesMove()
 	{
 		for(int y=1; y<gridH; y++)
 		{
@@ -125,9 +128,31 @@ public class BoardMan : MonoBehaviour {
 				}
 			}
 		}
+	}
 
+	public void ResolveFirstRow()
+	{
+		if(entities[playerPos[0], playerPos[1] + 1] != null)
+		{
+			GameObject target = entities[playerPos[0], playerPos[1] + 1];
+
+			if(target.GetComponent<NpcBehavior>())
+			{}	
+			else if(target.GetComponent<EnemyBehavior>())
+			{}
+
+			RemoveFromGrid(new int[] {playerPos[0], playerPos[1]+1});
+
+			Debug.Log("killed " + target.name);
+		}
+
+		NextTurn();				
+	}
+
+	public void NextTurn()
+	{
 		turnNmr++;
-		SpawnRow(WhatTypeOfRow());
+		SpawnRow(WhatTypeOfRow());	
 	}
 
 	public void KnifeImpact()
@@ -161,16 +186,45 @@ public class BoardMan : MonoBehaviour {
 		items[pos[0],pos[1]] = knife;	
 	}
 
-	public int[] EvaluateMovement(int[]pos, int[]dir)
+	bool isInBounds(int[] requestedPos)
+	{
+		if(requestedPos[0] >= 0 && requestedPos[0] < gridW && requestedPos[1] >= 0)
+			return true;
+		else 
+			return false;
+	}
+
+	public int[] EvaluateMovement(int[]pos, int[]dir, EntityBehavior entBehavior)
 	{
 		int[] requestedPos = new int[]{pos[0]+dir[0], pos[1]+dir[1]};
 		int[] newPos;
 
-		if((requestedPos[0] >= 0 && requestedPos[0] < gridW) && requestedPos[1] >= 0 && entities[requestedPos[0], requestedPos[1]] == null)
-			newPos = new int[] {requestedPos[0], requestedPos[1]};  
+		if(isInBounds(requestedPos)) //in bounds xy....
+		{
+			if(entities[requestedPos[0], requestedPos[1]] == null)
+				newPos = new int[] {requestedPos[0], requestedPos[1]}; 
+			else
+			{
+				int tryNeighborAt = Random.value <= .5 ? 1 : -1;
+
+				if(isInBounds(new int[]{requestedPos[0] - tryNeighborAt, requestedPos[1]}) && entities[requestedPos[0] - tryNeighborAt, requestedPos[1]] == null)
+					newPos = new int[] {requestedPos[0] - tryNeighborAt, requestedPos[1]}; 
+				else if(isInBounds(new int[]{requestedPos[0] + tryNeighborAt, requestedPos[1]}) && entities[requestedPos[0] + tryNeighborAt, requestedPos[1]] == null)
+					newPos = new int[] {requestedPos[0] + tryNeighborAt, requestedPos[1]}; 
+				else
+				{
+					newPos = new int[] {pos[0], pos[1]};
+				}	
+			} 
+		}
 		else
 		{
-			Debug.Log("invalid move - pos: " + pos[0] + " " + pos[1]);	
+			if(entBehavior.moveDirection.Length > 0)
+			{
+				entBehavior.moveDirection[0] = - entBehavior.moveDirection[0];
+				return EvaluateMovement(pos, dir, entBehavior);
+			}
+
 			newPos = new int[] {pos[0], pos[1]};	
 		}
 
@@ -182,7 +236,7 @@ public class BoardMan : MonoBehaviour {
 		GameObject ent = entities[pos[0], pos[1]];
 		EntityBehavior entB = ent.GetComponent<EntityBehavior>();
 
-		int[] newPos = EvaluateMovement(pos, dir);
+		int[] newPos = EvaluateMovement(pos, dir, entB);
 
 		entities[pos[0], pos[1]] = null;
 		entities[newPos[0], newPos[1]] = ent;
@@ -195,7 +249,7 @@ public class BoardMan : MonoBehaviour {
 		{}					
 	}
 
-	void RemoveFromGrid(int[] pos)
+	public void RemoveFromGrid(int[] pos)
 	{
 		if(entities[pos[0], pos[1]].GetComponent<EntityBehavior>().hasKnife  && entities[pos[0], pos[1]].GetComponent<EntityBehavior>().canDrop)
 		{

@@ -5,6 +5,8 @@ public enum PlayerMoves {left, right, still, knife};
 
 public class PlayerBehavior : EntityBehavior {
 
+	public bool playerBLocked = false;
+
 	void Update () {
 
 		if(Input.GetKeyDown("left"))
@@ -18,7 +20,9 @@ public class PlayerBehavior : EntityBehavior {
 	}
 
 	void ParseCommand(PlayerMoves move)
-	{									
+	{	
+		playerBLocked = true;
+										
 		switch(move)
 		{
 			case PlayerMoves.still:
@@ -35,8 +39,18 @@ public class PlayerBehavior : EntityBehavior {
 				break;
 		}
 
+
 		boardMan.playerPos = currentPos;
-		boardMan.EndTurn();
+		boardMan.OtherEntitiesMove();
+		Attack();
+	}
+
+	void Attack()
+	{
+		//animation here or something else...
+
+		boardMan.ResolveFirstRow();
+
 	}
 
 }
