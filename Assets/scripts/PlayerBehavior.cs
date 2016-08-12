@@ -48,9 +48,23 @@ public class PlayerBehavior : EntityBehavior {
 	void Attack()
 	{
 		//animation here or something else...
+		if(boardMan.entities[currentPos[0], currentPos[1] + 1] != null)
+		{
+			EntityBehavior target = boardMan.entities[currentPos[0], currentPos[1] + 1].GetComponent<EntityBehavior>();
+			scoreMan.HonorAndScoreUpdater(target, true);
+			boardMan.RemoveFromGrid(new int[] {currentPos[0], currentPos[1]+1});
+			Debug.Log("killed " + target.name);
+		}
 
-		boardMan.ResolveFirstRow();
-
+		if(scoreMan.honor > 0)
+		{
+			boardMan.ResolveFirstRow();
+		}
+		else
+		{
+			Debug.Log("game over!!!");
+			boardMan.ResolveFirstRow();
+		}
 	}
 
 }

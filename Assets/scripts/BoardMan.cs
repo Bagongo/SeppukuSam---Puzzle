@@ -10,12 +10,14 @@ public class BoardMan : MonoBehaviour {
 	public GameObject[] enemies;
 	public GameObject playerPrefab;
 	public GameObject knifePrefab;
+	public ScoreMan scoreMan;
 	public int turnNmr;
 	public int[] playerPos = {3,0}; 
 	public GameObject [,] grid; 
 	public GameObject[,] entities;
 	public GameObject[,] items;
 	public int turnsAtSetup = 5;
+
 
 	private enum Row {empty, npc, enemy};
 	private GameObject knife;
@@ -115,37 +117,26 @@ public class BoardMan : MonoBehaviour {
 
 	public void OtherEntitiesMove()
 	{
-		for(int y=1; y<gridH; y++)
+		for(int y=2; y<gridH; y++)
 		{
 			for(int x=0; x<gridW; x++)
 			{
 				if (entities[x,y] != null)
-				{
-					if(y == 1)
-						RemoveFromGrid(new int[]{x,y});
-					else						
-						entities[x,y].GetComponent<EntityBehavior>().RequestMove();
+				{						
+					entities[x,y].GetComponent<EntityBehavior>().RequestMove();
 				}
 			}
 		}
 	}
 
 	public void ResolveFirstRow()
-	{
-		if(entities[playerPos[0], playerPos[1] + 1] != null)
+	{		
+		for(int x=0; x<gridW; x++)
 		{
-			GameObject target = entities[playerPos[0], playerPos[1] + 1];
-
-			if(target.GetComponent<NpcBehavior>())
-			{}	
-			else if(target.GetComponent<EnemyBehavior>())
-			{}
-
-			RemoveFromGrid(new int[] {playerPos[0], playerPos[1]+1});
-
-			Debug.Log("killed " + target.name);
+			if (entities[x,1] != null)
+				RemoveFromGrid(new int[]{x,1});
 		}
-
+					
 		NextTurn();				
 	}
 

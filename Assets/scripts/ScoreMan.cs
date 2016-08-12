@@ -15,18 +15,26 @@ public class ScoreMan : MonoBehaviour {
 		scoreDisplayer.text += score;
 		honorDisplayer.text += honor;
 	}
-	
-	public bool HonorAndScoreUpdater(int sPoints, int hPoints)
+
+	public void HonorAndScoreUpdater(EntityBehavior entB, bool fromPlayer)
 	{
-		score += sPoints;
-		honor += hPoints;
+		if(fromPlayer)
+		{
+			if(entB.tag == "enemy")
+				score += entB.scoreValue;
+
+			honor += entB.honorValue;
+		}
+		else
+		{
+			if(entB.tag == "npc")
+				score += entB.scoreValue;
+			else
+				honor -= entB.honorValue;
+		}
 
 		scoreDisplayer.text = "Score: " +  score;
 		honorDisplayer.text = "Honor: " + honor;
 
-		if(honor > 0)
-			return true;
-		else 
-			return false;
 	}
 }

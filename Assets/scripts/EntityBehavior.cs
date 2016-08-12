@@ -5,6 +5,8 @@ public class EntityBehavior : MonoBehaviour {
 
 	public int[] currentPos;
 	public int[] moveDirection;
+	public int honorValue;
+	public int scoreValue;
 	public int nmbrOfMoves;
 	public bool hasKnife;
 	public bool canPickUp;
@@ -13,17 +15,22 @@ public class EntityBehavior : MonoBehaviour {
 	public BoardMan boardMan;
 	public GameObject[,] grid;
 	public GameObject[,] items;
+	public ScoreMan scoreMan;
+
 
 	protected virtual void Awake()
 	{
 		boardMan = (BoardMan)FindObjectOfType(typeof(BoardMan));
 		grid = boardMan.grid;
-		items = boardMan.items;		
+		items = boardMan.items;
+
+		scoreMan = (ScoreMan)FindObjectOfType(typeof(ScoreMan));			
 	}
 
 	public void RequestMove()
 	{
-		boardMan.ElaborateMove(currentPos, moveDirection);
+		for (int x=0; x < nmbrOfMoves; x++)
+			boardMan.ElaborateMove(currentPos, moveDirection);
 	}
 
 	public void MoveEntity(int[] newPos)
