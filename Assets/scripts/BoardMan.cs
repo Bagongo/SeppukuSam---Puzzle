@@ -11,24 +11,18 @@ public class BoardMan : MonoBehaviour {
 	public GameObject playerPrefab;
 	public GameObject knifePrefab;
 	public ScoreMan scoreMan;
-	public int turnNmr;
 	public int[] playerPos = {3,0}; 
 	public GameObject [,] grid; 
 	public GameObject[,] entities;
 	public GameObject[,] items;
-	public int turnsAtSetup = 5;
 
-
-	private enum Row {empty, npc, enemy};
 	private GameObject knife;
 	private GameObject player; 
-
-//	private GameObject entity; use to trim down some of the parameter passing....
-//	private int[] enitityPos;
 
 	void Awake(){
 
 		grid = new GameObject[gridW, gridH];
+		entities = new GameObject[gridW, gridH];
 		items = new GameObject[gridW, gridH];
 
 		for(int x=0; x<gridW; x++)
@@ -43,39 +37,17 @@ public class BoardMan : MonoBehaviour {
 		}
 
 		transform.position = new Vector3(transform.position.x - grid.GetLength(0)/2, transform.position.y - grid.GetLength(1)/2, 0);
-
 	}
 
 	void Start(){
 
-		entities = new GameObject[gridW, gridH];
-
 		player = Instantiate(playerPrefab, grid[playerPos[0], playerPos[1]].transform.position, Quaternion.identity) as GameObject;
 		entities[playerPos[0],playerPos[1]] = player;
 		player.GetComponent<PlayerBehavior>().currentPos = playerPos;
-
-		turnNmr = 1;
-
-		SpawnRow(WhatTypeOfRow());
-
-		for(int i=0; i<=turnsAtSetup; i++)
-		{
-			OtherEntitiesMove();
-			NextTurn();
-		}
 	}
 
-	Row WhatTypeOfRow()
-	{
-		if(turnNmr%7 == 0)
-			return Row.enemy;
-		else if(turnNmr%4 == 0 || turnNmr%5 == 0 || turnNmr%6 ==0)
-			return Row.npc;
-		else 
-			return Row.empty;
-	}
 
-	void SpawnRow(Row whatTospawn) //consider delegating type of spawnable choice to other method or brand new spawner in game element...
+	public void SpawnRow(Row whatTospawn) //consider delegating type of spawnable choice to other method or brand new spawner in game element...
 	{
 		Row whatToSpawn = whatTospawn;
 
@@ -115,37 +87,6 @@ public class BoardMan : MonoBehaviour {
 		}
 	}
 
-	public void OtherEntitiesMove()
-	{
-		for(int y=2; y<gridH; y++)
-		{
-			for(int x=0; x<gridW; x++)
-			{
-				if (entities[x,y] != null)
-				{						
-					entities[x,y].GetComponent<EntityBehavior>().RequestMove();
-				}
-			}
-		}
-	}
-
-	public void ResolveFirstRow()
-	{		
-		for(int x=0; x<gridW; x++)
-		{
-			if (entities[x,1] != null)
-				RemoveFromGrid(new int[]{x,1});
-		}
-					
-		NextTurn();				
-	}
-
-	public void NextTurn()
-	{
-		turnNmr++;
-		SpawnRow(WhatTypeOfRow());	
-	}
-
 	public void KnifeImpact()
 	{
 		int x = playerPos[0];
@@ -177,67 +118,11 @@ public class BoardMan : MonoBehaviour {
 		items[pos[0],pos[1]] = knife;	
 	}
 
-	bool isInBounds(int[] requestedPos)
+	public void UpdateGrid(int[]formerPos, int[]newPos)
 	{
-		if(requestedPos[0] >= 0 && requestedPos[0] < gridW && requestedPos[1] >= 0)
-			return true;
-		else 
-			return false;
-	}
-
-	public int[] EvaluateMovement(int[]pos, int[]dir, EntityBehavior entBehavior)
-	{
-		int[] requestedPos = new int[]{pos[0]+dir[0], pos[1]+dir[1]};
-		int[] newPos;
-
-		if(isInBounds(requestedPos)) //in bounds xy....
-		{
-			if(entities[requestedPos[0], requestedPos[1]] == null)
-				newPos = new int[] {requestedPos[0], requestedPos[1]}; 
-			else
-			{
-				int tryNeighborAt = Random.value <= .5 ? 1 : -1;
-
-				if(isInBounds(new int[]{requestedPos[0] - tryNeighborAt, requestedPos[1]}) && entities[requestedPos[0] - tryNeighborAt, requestedPos[1]] == null)
-					newPos = new int[] {requestedPos[0] - tryNeighborAt, requestedPos[1]}; 
-				else if(isInBounds(new int[]{requestedPos[0] + tryNeighborAt, requestedPos[1]}) && entities[requestedPos[0] + tryNeighborAt, requestedPos[1]] == null)
-					newPos = new int[] {requestedPos[0] + tryNeighborAt, requestedPos[1]}; 
-				else
-				{
-					newPos = new int[] {pos[0], pos[1]};
-				}	
-			} 
-		}
-		else
-		{
-			if(entBehavior.moveDirection.Length > 0)
-			{
-				entBehavior.moveDirection[0] = - entBehavior.moveDirection[0];
-				return EvaluateMovement(pos, dir, entBehavior);
-			}
-
-			newPos = new int[] {pos[0], pos[1]};	
-		}
-
-		return newPos;
-	}
-
-	public void ElaborateMove(int[]pos, int[]dir)
-	{
-		GameObject ent = entities[pos[0], pos[1]];
-		EntityBehavior entB = ent.GetComponent<EntityBehavior>();
-
-		int[] newPos = EvaluateMovement(pos, dir, entB);
-
-		entities[pos[0], pos[1]] = null;
+		GameObject ent = entities[formerPos[0], formerPos[1]];
+		entities[formerPos[0], formerPos[1]] = null;
 		entities[newPos[0], newPos[1]] = ent;
-
-		entB.MoveEntity(newPos);
-
-		if(ent.GetComponent<EnemyBehavior>())
-		{}
-		else if(ent.GetComponent<NpcBehavior>())
-		{}					
 	}
 
 	public void RemoveFromGrid(int[] pos)

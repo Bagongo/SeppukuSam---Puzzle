@@ -32,16 +32,15 @@ public class PlayerBehavior : EntityBehavior {
 				boardMan.KnifeImpact();
 				break;
 			case PlayerMoves.left:
-				boardMan.ElaborateMove(currentPos, new int[]{-1, currentPos[1]});
+				ElaborateMove(new int[]{-1, currentPos[1]});
 				break;
 			case PlayerMoves.right:
-				boardMan.ElaborateMove(currentPos, new int[]{1, currentPos[1]});
+				ElaborateMove(new int[]{1, currentPos[1]});
 				break;
 		}
 
-
 		boardMan.playerPos = currentPos;
-		boardMan.OtherEntitiesMove();
+		turnMan.OtherEntitiesMove();
 		Attack();
 	}
 
@@ -56,15 +55,7 @@ public class PlayerBehavior : EntityBehavior {
 			Debug.Log("killed " + target.name);
 		}
 
-		if(scoreMan.honor > 0)
-		{
-			boardMan.ResolveFirstRow();
-		}
-		else
-		{
-			Debug.Log("game over!!!");
-			boardMan.ResolveFirstRow();
-		}
+		turnMan.EvaluateContinuation();
 	}
 
 }
