@@ -4,6 +4,7 @@ using System.Collections;
 public class EntityBehavior : MonoBehaviour {
 
 	public int[] currentPos;
+	public int[] nextPos;
 	public int[] moveDirection;
 	public int honorValue;
 	public int scoreValue;
@@ -18,19 +19,20 @@ public class EntityBehavior : MonoBehaviour {
 	public ScoreMan scoreMan;
 	public int gridW;
 	public int gridH;
+	public Castle castle;
+	public float moveTime = 1f;
 
 	protected virtual void Awake()
 	{
 		boardMan = (BoardMan)FindObjectOfType(typeof(BoardMan));
-
 		grid = boardMan.grid;
 		gridW = boardMan.gridW;
 		gridH = boardMan.gridH;
-
 		items = boardMan.items;
 
 		turnMan = (TurnMan)FindObjectOfType(typeof(TurnMan));
-		scoreMan = (ScoreMan)FindObjectOfType(typeof(ScoreMan));			
+		scoreMan = (ScoreMan)FindObjectOfType(typeof(ScoreMan));
+		castle = (Castle)FindObjectOfType(typeof(Castle));			
 	}
 
 	public void RequestMove()
@@ -39,12 +41,36 @@ public class EntityBehavior : MonoBehaviour {
 			ElaborateMove(moveDirection);
 	}
 
-	public void MoveEntity(int[] newPos)
+	public void FinalizeMovement()
 	{
-		currentPos = newPos;
-		transform.position = grid[currentPos[0], currentPos[1]].transform.position;	
-		LookForKnife();															
+		currentPos = nextPos;
+		transform.position = grid[currentPos[0], currentPos[1]].transform.position;
+		LookForKnife();	
+
+		if(GetComponent<PlayerBehavior>())
+		{
+			boardMan.playerPos = currentPos;
+			turnMan.OtherEntitiesMove();
+			GetComponent<PlayerBehavior>().Attack();
+		}														
 	}
+
+	//Co-routine for moving units from one space to next, takes a parameter end to specify where to move to.
+    protected IEnumerator SmoothMovement (Vector3 endPos)
+    {
+		//Vector3 endPos = grid[newPos[0], newPos[1]].transform.position;
+		float sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
+
+		while(sqrRemainingDistance > float.Epsilon)
+        {
+			transform.position = Vector3.MoveTowards(transform.position, endPos, 2 * Time.deltaTime);
+			sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
+			
+            yield return null;
+        }
+
+        FinalizeMovement();
+    }
 
 	public void LookForKnife()
 	{
@@ -70,7 +96,7 @@ public class EntityBehavior : MonoBehaviour {
 
 		if(isInBounds(requestedPos)) //in bounds xy....
 		{
-			if(boardMan.entities[requestedPos[0], requestedPos[1]] == null)
+			if(boardMan.entities[requestedPos[0], requestedPos[1]] == null || boardMan.entities[requestedPos[0], requestedPos[1]].tag == "Player")
 				newPos = new int[] {requestedPos[0], requestedPos[1]}; 
 			else
 			{
@@ -102,10 +128,21 @@ public class EntityBehavior : MonoBehaviour {
 
 	public void ElaborateMove(int[] dir)
 	{
-		int[] newPos = EvaluateMovement(dir);
+		nextPos = EvaluateMovement(dir);
+		boardMan.UpdateGrid(currentPos, nextPos);				
+		Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
+		StartCoroutine(SmoothMovement(newPos));
+	}
 
-		boardMan.UpdateGrid(currentPos, newPos);
+	public void GoToCastle()
+	{
+		boardMan.RemoveFromGrid(currentPos);
+		Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
+		StartCoroutine(SmoothMovement(newPos));
+	}
 
-		MoveEntity(newPos);			
+	public void EliminateEntity()
+	{
+		Destroy(this.gameObject);	
 	}
 }

@@ -15,9 +15,9 @@ public class BoardMan : MonoBehaviour {
 	public GameObject [,] grid; 
 	public GameObject[,] entities;
 	public GameObject[,] items;
+	public GameObject player; 
 
 	private GameObject knife;
-	private GameObject player; 
 
 	void Awake(){
 
@@ -97,8 +97,10 @@ public class BoardMan : MonoBehaviour {
 
 			if(entities[x,i] != null)
 			{
-				RemoveFromGrid(pos); //should call method 'killSmething' once it's ready....
+				EntityBehavior entB = entities[x,i].GetComponent<EntityBehavior>();
 				DropKnife(pos);	
+				RemoveFromGrid(pos); //should call method 'killSmething' once it's ready....
+				entB.EliminateEntity();
 				break;
 			}
 			else if(i == gridH-1 && entities[x,i] == null)
@@ -127,13 +129,13 @@ public class BoardMan : MonoBehaviour {
 
 	public void RemoveFromGrid(int[] pos)
 	{
-		if(entities[pos[0], pos[1]].GetComponent<EntityBehavior>().hasKnife  && entities[pos[0], pos[1]].GetComponent<EntityBehavior>().canDrop)
+		if(entities[pos[0], pos[1]].GetComponent<NpcBehavior>() && entities[pos[0], pos[1]].GetComponent<NpcBehavior>().hasKnife)
 		{
 			DropKnife(new int[] {pos[0], pos[1] - 1});
 			player.GetComponent<PlayerBehavior>().LookForKnife(); //put somewhere in animation or else. Move the whole knifedropping at eliminate.........
 		}
 
-		Destroy(entities[pos[0], pos[1]].gameObject);
+		//Destroy(entities[pos[0], pos[1]].gameObject);
 		entities[pos[0], pos[1]] = null;												
 	}
 

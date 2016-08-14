@@ -13,7 +13,6 @@ public class TurnMan : MonoBehaviour {
 	private BoardMan boardMan;
 	private ScoreMan scoreMan;
 
-
 	void Awake()
 	{
 		boardMan = (BoardMan)FindObjectOfType(typeof(BoardMan));
@@ -30,11 +29,11 @@ public class TurnMan : MonoBehaviour {
 
 		boardMan.SpawnRow(WhatTypeOfRow(turnNmr));
 
-		for(int i=0; i<=turnsAtSetup; i++)
-		{
-			OtherEntitiesMove();
-			NextTurn();
-		}
+//		for(int i=0; i<=turnsAtSetup; i++)
+//		{
+//			OtherEntitiesMove();
+//			NextTurn();
+//		}
 	}
 
 	Row WhatTypeOfRow(int turnNmr)
@@ -61,17 +60,12 @@ public class TurnMan : MonoBehaviour {
 		}
 	}
 
-	public void EvaluateContinuation()
+	public bool EvaluateContinuation()
 	{
 		if(scoreMan.honor > 0)
-		{
-			ResolveFirstRow();
-		}
+			return true;
 		else
-		{
-			Debug.Log("game over!!!");
-			ResolveFirstRow();
-		}
+			return false;
 	}
 
 	public void ResolveFirstRow()
@@ -79,7 +73,7 @@ public class TurnMan : MonoBehaviour {
 		for(int x=0; x<gridW; x++)
 		{
 			if (boardMan.entities[x,1] != null)
-				boardMan.RemoveFromGrid(new int[]{x,1});
+				boardMan.entities[x,1].GetComponent<EntityBehavior>().GoToCastle();
 		}
 					
 		NextTurn();				
@@ -88,7 +82,14 @@ public class TurnMan : MonoBehaviour {
 	public void NextTurn()
 	{
 		turnNmr++;
-		boardMan.SpawnRow(WhatTypeOfRow(turnNmr));	
+		boardMan.SpawnRow(WhatTypeOfRow(turnNmr));
+		boardMan.player.GetComponent<PlayerBehavior>().playerBlocked = false;	
+	}
+
+	public void GameOver()
+	{
+		Debug.Log("Game Over");
+		NextTurn();
 	}
 
 

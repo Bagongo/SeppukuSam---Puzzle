@@ -5,10 +5,12 @@ public enum PlayerMoves {left, right, still, knife};
 
 public class PlayerBehavior : EntityBehavior {
 
-	public bool playerBLocked = false;
+	public bool playerBlocked = false;
 
 	void Update () {
 
+		if(!playerBlocked)
+		{
 		if(Input.GetKeyDown("left"))
 			ParseCommand(PlayerMoves.left);
 		else if(Input.GetKeyDown("right"))
@@ -17,34 +19,33 @@ public class PlayerBehavior : EntityBehavior {
 			ParseCommand(PlayerMoves.still);
 		else if(Input.GetKeyDown("up") && hasKnife)
 			ParseCommand(PlayerMoves.knife);
+		}
 	}
 
 	void ParseCommand(PlayerMoves move)
 	{	
-		playerBLocked = true;
+		playerBlocked = true;
 										
 		switch(move)
 		{
 			case PlayerMoves.still:
+				ElaborateMove(new int[]{0,0});			
 				break;
 			case PlayerMoves.knife:
 				hasKnife = false;				
 				boardMan.KnifeImpact();
+				ElaborateMove(new int[]{0,0});
 				break;
 			case PlayerMoves.left:
-				ElaborateMove(new int[]{-1, currentPos[1]});
+				ElaborateMove(new int[]{-1,0});
 				break;
 			case PlayerMoves.right:
-				ElaborateMove(new int[]{1, currentPos[1]});
+				ElaborateMove(new int[]{1,0});
 				break;
 		}
-
-		boardMan.playerPos = currentPos;
-		turnMan.OtherEntitiesMove();
-		Attack();
 	}
 
-	void Attack()
+	public void Attack()
 	{
 		//animation here or something else...
 		if(boardMan.entities[currentPos[0], currentPos[1] + 1] != null)
@@ -52,10 +53,14 @@ public class PlayerBehavior : EntityBehavior {
 			EntityBehavior target = boardMan.entities[currentPos[0], currentPos[1] + 1].GetComponent<EntityBehavior>();
 			scoreMan.HonorAndScoreUpdater(target, true);
 			boardMan.RemoveFromGrid(new int[] {currentPos[0], currentPos[1]+1});
+			target.EliminateEntity();
 			Debug.Log("killed " + target.name);
 		}
 
-		turnMan.EvaluateContinuation();
+		if(turnMan.EvaluateContinuation())
+			turnMan.ResolveFirstRow();
+		else
+			turnMan.ResolveFirstRow();
 	}
 
 }
