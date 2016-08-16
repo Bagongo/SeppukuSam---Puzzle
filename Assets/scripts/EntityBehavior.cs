@@ -20,7 +20,7 @@ public class EntityBehavior : MonoBehaviour {
 	public int gridW;
 	public int gridH;
 	public Castle castle;
-	public float moveTime = 1f;
+	public float speed = 10f;
 
 	protected virtual void Awake()
 	{
@@ -35,12 +35,6 @@ public class EntityBehavior : MonoBehaviour {
 		castle = (Castle)FindObjectOfType(typeof(Castle));			
 	}
 
-	public void RequestMove()
-	{
-		for (int x=0; x < nmbrOfMoves; x++)
-			ElaborateMove(moveDirection);
-	}
-
 	public void FinalizeMovement()
 	{
 		currentPos = nextPos;
@@ -50,20 +44,28 @@ public class EntityBehavior : MonoBehaviour {
 		if(GetComponent<PlayerBehavior>())
 		{
 			boardMan.playerPos = currentPos;
-			turnMan.OtherEntitiesMove();
-			GetComponent<PlayerBehavior>().Attack();
-		}														
+			turnMan.NpcsAndEnemiesMove();
+		}
+//		else if(currentPos[1] < 1)
+//		{
+//			castle.TakeIn(this);
+//		}
+		else
+		{
+			turnMan.movesCompleted++;
+
+			if(turnMan.ContinueTurn())
+				turnMan.AllEntitiesMoved();													
+		}
 	}
 
-	//Co-routine for moving units from one space to next, takes a parameter end to specify where to move to.
     protected IEnumerator SmoothMovement (Vector3 endPos)
     {
-		//Vector3 endPos = grid[newPos[0], newPos[1]].transform.position;
 		float sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
 
 		while(sqrRemainingDistance > float.Epsilon)
         {
-			transform.position = Vector3.MoveTowards(transform.position, endPos, 2 * Time.deltaTime);
+			transform.position = Vector3.MoveTowards(transform.position, endPos, speed * Time.deltaTime);
 			sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
 			
             yield return null;
@@ -94,9 +96,9 @@ public class EntityBehavior : MonoBehaviour {
 		int[] requestedPos = new int[]{currentPos[0]+dir[0], currentPos[1]+dir[1]};
 		int[] newPos;
 
-		if(isInBounds(requestedPos)) //in bounds xy....
+		if(isInBounds(requestedPos))
 		{
-			if(boardMan.entities[requestedPos[0], requestedPos[1]] == null || boardMan.entities[requestedPos[0], requestedPos[1]].tag == "Player")
+			if(boardMan.entities[requestedPos[0], requestedPos[1]] == null)
 				newPos = new int[] {requestedPos[0], requestedPos[1]}; 
 			else
 			{
@@ -134,11 +136,25 @@ public class EntityBehavior : MonoBehaviour {
 		StartCoroutine(SmoothMovement(newPos));
 	}
 
+	public void RequestMove()
+	{
+		for(int i=0; i<nmbrOfMoves; i++)
+		{
+			turnMan.movesInitiated++;
+			ElaborateMove(moveDirection);
+		}
+	}
+
+
 	public void GoToCastle()
 	{
-		boardMan.RemoveFromGrid(currentPos);
-		Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
-		StartCoroutine(SmoothMovement(newPos));
+		turnMan.entsToCastle++;
+		Vector3 posInCastle = new Vector3(transform.position.x, castle.transform.position.y, 0);
+		StartCoroutine(SmoothMovement(posInCastle));
+
+//		turnMan.entsToCastle++;
+//		ElaborateMove(new int[]{0,-1});
+
 	}
 
 	public void EliminateEntity()

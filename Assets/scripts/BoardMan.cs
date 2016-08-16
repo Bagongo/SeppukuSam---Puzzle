@@ -129,9 +129,9 @@ public class BoardMan : MonoBehaviour {
 
 	public void RemoveFromGrid(int[] pos)
 	{
-		if(entities[pos[0], pos[1]].GetComponent<NpcBehavior>() && entities[pos[0], pos[1]].GetComponent<NpcBehavior>().hasKnife)
+		if(entities[pos[0], pos[1]].GetComponent<EntityBehavior>().hasKnife && entities[pos[0], pos[1]].GetComponent<EntityBehavior>().canDrop)
 		{
-			DropKnife(new int[] {pos[0], pos[1] - 1});
+			DropKnife(new int[] {pos[0], pos[1]});
 			player.GetComponent<PlayerBehavior>().LookForKnife(); //put somewhere in animation or else. Move the whole knifedropping at eliminate.........
 		}
 

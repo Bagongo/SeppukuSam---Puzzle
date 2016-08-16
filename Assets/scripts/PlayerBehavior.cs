@@ -29,24 +29,28 @@ public class PlayerBehavior : EntityBehavior {
 		switch(move)
 		{
 			case PlayerMoves.still:
-				ElaborateMove(new int[]{0,0});			
+				moveDirection = new int[]{0,0};
 				break;
 			case PlayerMoves.knife:
 				hasKnife = false;				
 				boardMan.KnifeImpact();
-				ElaborateMove(new int[]{0,0});
+				moveDirection = new int[]{0,0};
 				break;
 			case PlayerMoves.left:
-				ElaborateMove(new int[]{-1,0});
+				moveDirection = new int[]{-1,0,};
 				break;
 			case PlayerMoves.right:
-				ElaborateMove(new int[]{1,0});
+				moveDirection = new int[]{1,0,};
 				break;
 		}
+
+		ElaborateMove(moveDirection);
 	}
 
 	public void Attack()
 	{
+
+		Debug.Log("player Attacking....");
 		//animation here or something else...
 		if(boardMan.entities[currentPos[0], currentPos[1] + 1] != null)
 		{
@@ -54,13 +58,15 @@ public class PlayerBehavior : EntityBehavior {
 			scoreMan.HonorAndScoreUpdater(target, true);
 			boardMan.RemoveFromGrid(new int[] {currentPos[0], currentPos[1]+1});
 			target.EliminateEntity();
-			Debug.Log("killed " + target.name);
 		}
 
-		if(turnMan.EvaluateContinuation())
+		if(turnMan.ContinueGame())			
 			turnMan.ResolveFirstRow();
 		else
+		{
+			//turnMan.GameOver();
 			turnMan.ResolveFirstRow();
+		}
 	}
 
 }

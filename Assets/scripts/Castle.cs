@@ -5,16 +5,51 @@ public class Castle : MonoBehaviour {
 
 	public ScoreMan scoreMan;
 	public TurnMan turnMan;
+	public BoardMan boardMan;
 
-	void OnTriggerenter2D(Collider coll)
+	public void TakeIn(EntityBehavior entB)
 	{
-		EntityBehavior entB = coll.GetComponent<EntityBehavior>();
+
+		//Debug.Log(entB.name + " " + entB.currentPos[0] + " " + entB.currentPos[1]);
+
 		scoreMan.HonorAndScoreUpdater(entB, false);
 
+		boardMan.RemoveFromGrid(entB.currentPos);
 
-		if(!turnMan.EvaluateContinuation())
-			turnMan.GameOver();
+//		if(turnMan.ContinueGame())
+//		{
+			entB.EliminateEntity();
+			turnMan.entsInCastle++;
 
-		entB.EliminateEntity();
+			if(turnMan.ContinueTurn2())
+			{
+				turnMan.NextTurn();
+			}
+//		}
+//		else
+//			turnMan.GameOver();
+	}
+
+	void OnTriggerEnter2D(Collider2D coll)
+	{
+
+		//Debug.Log(entB.name + " " + entB.currentPos[0] + " " + entB.currentPos[1]);
+
+		EntityBehavior entB = coll.GetComponent<EntityBehavior>();
+
+		scoreMan.HonorAndScoreUpdater(entB, false);
+
+		boardMan.RemoveFromGrid(entB.currentPos);
+
+//		if(turnMan.ContinueGame())
+//		{
+			entB.EliminateEntity();
+			turnMan.entsInCastle++;
+
+			if(turnMan.ContinueTurn2())
+			{
+				turnMan.NextTurn();
+			}
+	
 	}
 }
