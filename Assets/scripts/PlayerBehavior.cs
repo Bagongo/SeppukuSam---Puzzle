@@ -51,7 +51,7 @@ public class PlayerBehavior : EntityBehavior {
 	{
 		int[] requestedPos = new int[]{currentPos[0]+moveDirection[0], currentPos[1]};
 
-		if(isInBounds(requestedPos))
+		if(IsInBoundsX(requestedPos))
 			nextPos = requestedPos;
 		else
 		{

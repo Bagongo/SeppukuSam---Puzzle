@@ -17,7 +17,7 @@ public class Castle : MonoBehaviour {
 //		if(turnMan.ContinueGame())
 //		{
 			entB.EliminateEntity();
-			turnMan.movesCompleted++;
+			turnMan.movesCleared++;
 
 			if(turnMan.ContinueTurn())
 			{
@@ -42,7 +42,7 @@ public class Castle : MonoBehaviour {
 //		if(turnMan.ContinueGame())
 //		{
 			entB.EliminateEntity();
-			turnMan.movesCompleted++;
+			turnMan.movesCleared++;
 
 			if(turnMan.ContinueTurn())
 			{

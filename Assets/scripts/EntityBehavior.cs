@@ -3,12 +3,14 @@ using System.Collections;
 
 public class EntityBehavior : MonoBehaviour {
 
+	//protect vars that don't need to be public
 	public int[] currentPos;
 	public int[] nextPos;
 	public int[] moveDirection;
 	public int honorValue;
 	public int scoreValue;
 	public int nmbrOfMoves;
+	public bool nextMoveClear = true;
 	public bool hasKnife;
 	public bool canPickUp;
 	public bool canDrop;
@@ -52,7 +54,8 @@ public class EntityBehavior : MonoBehaviour {
 		}
 		else
 		{
-			turnMan.movesCompleted++;
+			turnMan.movesCleared++;
+			nextMoveClear = true;
 
 			if(turnMan.ContinueTurn())
 				turnMan.AllEntitiesMoved();													
@@ -83,9 +86,17 @@ public class EntityBehavior : MonoBehaviour {
 		}
 	}
 
-	public bool isInBounds(int[] requestedPos)
+	public bool IsInBoundsX(int[] requestedPos)
 	{
-		if(requestedPos[0] >= 0 && requestedPos[0] < gridW && requestedPos[1] >= 0)
+		if(requestedPos[0] >= 0 && requestedPos[0] < gridW)
+			return true;
+		else 
+			return false;
+	}
+
+	public bool IsInBoundsY(int[] requestedPos)
+	{
+		if(requestedPos[1] > 0 && requestedPos[1] < gridH)
 			return true;
 		else 
 			return false;
@@ -96,7 +107,9 @@ public class EntityBehavior : MonoBehaviour {
 		int[] requestedPos = new int[]{currentPos[0]+moveDirection[0], currentPos[1]+moveDirection[1]};
 		int[] newPos;
 
-		if(isInBounds(requestedPos))
+//		if(requestedPos[1] < 1)
+//			return currentPos;						
+		if(IsInBoundsX(requestedPos))
 		{
 			if(boardMan.entities[requestedPos[0], requestedPos[1]] == null || requestedPos[1] == 0)
 				newPos = requestedPos;
@@ -104,9 +117,9 @@ public class EntityBehavior : MonoBehaviour {
 			{
 				int tryNeighborAt = Random.value <= .5 ? 1 : -1;
 
-				if(isInBounds(new int[]{requestedPos[0] - tryNeighborAt, requestedPos[1]}) && boardMan.entities[requestedPos[0] - tryNeighborAt, requestedPos[1]] == null)
+				if(IsInBoundsX(new int[]{requestedPos[0] - tryNeighborAt, requestedPos[1]}) && boardMan.entities[requestedPos[0] - tryNeighborAt, requestedPos[1]] == null)
 					newPos = new int[] {requestedPos[0] - tryNeighborAt, requestedPos[1]}; 
-				else if(isInBounds(new int[]{requestedPos[0] + tryNeighborAt, requestedPos[1]}) && boardMan.entities[requestedPos[0] + tryNeighborAt, requestedPos[1]] == null)
+				else if(IsInBoundsX(new int[]{requestedPos[0] + tryNeighborAt, requestedPos[1]}) && boardMan.entities[requestedPos[0] + tryNeighborAt, requestedPos[1]] == null)
 					newPos = new int[] {requestedPos[0] + tryNeighborAt, requestedPos[1]}; 
 				else
 				{
@@ -122,7 +135,7 @@ public class EntityBehavior : MonoBehaviour {
 				return EvaluateMovement();
 			}
 
-			newPos = new int[] {currentPos[0], currentPos[1]};	
+			newPos = currentPos;	
 		}
 
 		return newPos;
@@ -136,13 +149,30 @@ public class EntityBehavior : MonoBehaviour {
 		StartCoroutine(SmoothMovement(newPos));
 	}
 
-	public void RequestMove()
+//	public void RequestMove()
+//	{
+//		for(int i=0; i<nmbrOfMoves; i++)
+//		{
+//			turnMan.movesInitiated++;
+//			ElaborateMove();
+//		}
+//	}
+
+	public IEnumerator RequestMove()
 	{
-		for(int i=0; i<nmbrOfMoves; i++)
-		{
-			turnMan.movesInitiated++;
-			ElaborateMove();
-		}
+			for(int i=0; i<nmbrOfMoves; i++)
+			{
+				ElaborateMove();
+				nextMoveClear = false;
+
+				while(!nextMoveClear)
+				{
+					Debug.Log("holding....");
+					yield return null;
+				}
+			}
+
+			Debug.Log("exited loop...");
 	}
 
 
@@ -153,7 +183,6 @@ public class EntityBehavior : MonoBehaviour {
 //		StartCoroutine(SmoothMovement(posInCastle));
 
 		moveDirection = new int[]{0, -1};
-		turnMan.movesInitiated++;
 		ElaborateMove();
 
 	}
