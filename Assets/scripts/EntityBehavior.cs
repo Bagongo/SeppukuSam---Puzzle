@@ -46,10 +46,10 @@ public class EntityBehavior : MonoBehaviour {
 			boardMan.playerPos = currentPos;
 			turnMan.NpcsAndEnemiesMove();
 		}
-//		else if(currentPos[1] < 1)
-//		{
-//			castle.TakeIn(this);
-//		}
+		else if(currentPos[1] < 1)
+		{
+			castle.TakeIn(this);
+		}
 		else
 		{
 			turnMan.movesCompleted++;
@@ -83,7 +83,7 @@ public class EntityBehavior : MonoBehaviour {
 		}
 	}
 
-	bool isInBounds(int[] requestedPos)
+	public bool isInBounds(int[] requestedPos)
 	{
 		if(requestedPos[0] >= 0 && requestedPos[0] < gridW && requestedPos[1] >= 0)
 			return true;
@@ -91,15 +91,15 @@ public class EntityBehavior : MonoBehaviour {
 			return false;
 	}
 
-	public int[] EvaluateMovement(int[] dir)
+	public int[] EvaluateMovement()
 	{
-		int[] requestedPos = new int[]{currentPos[0]+dir[0], currentPos[1]+dir[1]};
+		int[] requestedPos = new int[]{currentPos[0]+moveDirection[0], currentPos[1]+moveDirection[1]};
 		int[] newPos;
 
 		if(isInBounds(requestedPos))
 		{
-			if(boardMan.entities[requestedPos[0], requestedPos[1]] == null)
-				newPos = new int[] {requestedPos[0], requestedPos[1]}; 
+			if(boardMan.entities[requestedPos[0], requestedPos[1]] == null || requestedPos[1] == 0)
+				newPos = requestedPos;
 			else
 			{
 				int tryNeighborAt = Random.value <= .5 ? 1 : -1;
@@ -116,10 +116,10 @@ public class EntityBehavior : MonoBehaviour {
 		}
 		else
 		{
-			if(moveDirection.Length > 0)
+			if(moveDirection[0] != 0)
 			{
 				moveDirection[0] = - moveDirection[0];
-				return EvaluateMovement(moveDirection);
+				return EvaluateMovement();
 			}
 
 			newPos = new int[] {currentPos[0], currentPos[1]};	
@@ -128,9 +128,9 @@ public class EntityBehavior : MonoBehaviour {
 		return newPos;
 	}
 
-	public void ElaborateMove(int[] dir)
+	public virtual void ElaborateMove()
 	{
-		nextPos = EvaluateMovement(dir);
+		nextPos = EvaluateMovement();
 		boardMan.UpdateGrid(currentPos, nextPos);				
 		Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
 		StartCoroutine(SmoothMovement(newPos));
@@ -141,24 +141,29 @@ public class EntityBehavior : MonoBehaviour {
 		for(int i=0; i<nmbrOfMoves; i++)
 		{
 			turnMan.movesInitiated++;
-			ElaborateMove(moveDirection);
+			ElaborateMove();
 		}
 	}
 
 
 	public void GoToCastle()
 	{
-		turnMan.entsToCastle++;
-		Vector3 posInCastle = new Vector3(transform.position.x, castle.transform.position.y, 0);
-		StartCoroutine(SmoothMovement(posInCastle));
-
 //		turnMan.entsToCastle++;
-//		ElaborateMove(new int[]{0,-1});
+//		Vector3 posInCastle = new Vector3(transform.position.x, castle.transform.position.y, 0);
+//		StartCoroutine(SmoothMovement(posInCastle));
+
+		moveDirection = new int[]{0, -1};
+		turnMan.movesInitiated++;
+		ElaborateMove();
 
 	}
 
 	public void EliminateEntity()
 	{
+		if(hasKnife && canDrop)
+			boardMan.DropKnife(currentPos);
+
+		boardMan.RemoveFromGrid(currentPos);
 		Destroy(this.gameObject);	
 	}
 }

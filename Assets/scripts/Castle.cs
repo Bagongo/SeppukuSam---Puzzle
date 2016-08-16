@@ -14,14 +14,12 @@ public class Castle : MonoBehaviour {
 
 		scoreMan.HonorAndScoreUpdater(entB, false);
 
-		boardMan.RemoveFromGrid(entB.currentPos);
-
 //		if(turnMan.ContinueGame())
 //		{
 			entB.EliminateEntity();
-			turnMan.entsInCastle++;
+			turnMan.movesCompleted++;
 
-			if(turnMan.ContinueTurn2())
+			if(turnMan.ContinueTurn())
 			{
 				turnMan.NextTurn();
 			}
@@ -44,9 +42,9 @@ public class Castle : MonoBehaviour {
 //		if(turnMan.ContinueGame())
 //		{
 			entB.EliminateEntity();
-			turnMan.entsInCastle++;
+			turnMan.movesCompleted++;
 
-			if(turnMan.ContinueTurn2())
+			if(turnMan.ContinueTurn())
 			{
 				turnMan.NextTurn();
 			}

@@ -22,7 +22,6 @@ public class TurnMan : MonoBehaviour {
 	void Awake()
 	{
 		boardMan = (BoardMan)FindObjectOfType(typeof(BoardMan));
-
 		gridW = boardMan.gridW;
 		gridH = boardMan.gridH;
 
@@ -108,18 +107,6 @@ public class TurnMan : MonoBehaviour {
 			return false;
 	}
 
-	public bool ContinueTurn2()
-	{
-		if(entsInCastle >= entsToCastle)
-		{
-			entsToCastle = 0;
-			entsInCastle = 0;
-			return true;
-		}
-		else
-			return false;
-	}
-
 	public bool ContinueGame()
 	{
 		if(scoreMan.honor > 0)
@@ -130,18 +117,9 @@ public class TurnMan : MonoBehaviour {
 
 	public void NextTurn()
 	{
-
-		Debug.Log("next turn called!");
-
 		turnNmr++;
 		boardMan.SpawnRow(WhatTypeOfRow(turnNmr));
-		boardMan.player.GetComponent<PlayerBehavior>().playerBlocked = false;	
-
-//		for(int i=0; i<gridW; i++)
-//		{
-//			if(boardMan.entities[i,8] != null)
-//				Debug.Log(boardMan.entities[i,8].name);
-//		}
+		player.playerBlocked = false;	
 	}
 
 	public void GameOver()

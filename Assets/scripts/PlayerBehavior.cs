@@ -44,19 +44,35 @@ public class PlayerBehavior : EntityBehavior {
 				break;
 		}
 
-		ElaborateMove(moveDirection);
+		ElaborateMove();
+	}
+
+	public override void ElaborateMove()
+	{
+		int[] requestedPos = new int[]{currentPos[0]+moveDirection[0], currentPos[1]};
+
+		if(isInBounds(requestedPos))
+			nextPos = requestedPos;
+		else
+		{
+			Debug.Log("invalid move requested...");
+			nextPos = currentPos;
+		}
+
+		boardMan.UpdateGrid(currentPos, nextPos);				
+		Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
+		StartCoroutine(SmoothMovement(newPos));
 	}
 
 	public void Attack()
 	{
 
-		Debug.Log("player Attacking....");
+		//Debug.Log("player Attacking....");
 		//animation here or something else...
 		if(boardMan.entities[currentPos[0], currentPos[1] + 1] != null)
 		{
 			EntityBehavior target = boardMan.entities[currentPos[0], currentPos[1] + 1].GetComponent<EntityBehavior>();
 			scoreMan.HonorAndScoreUpdater(target, true);
-			boardMan.RemoveFromGrid(new int[] {currentPos[0], currentPos[1]+1});
 			target.EliminateEntity();
 		}
 
