@@ -8,10 +8,8 @@ public class TurnMan : MonoBehaviour {
 	public int turnNmr;
 	public int turnsAtSetup = 5;
 	public bool holdStep = false;
-	public int movesInitiated = 0;
-	public int movesCompleted = 0;
-	public int entsToCastle = 0;
-	public int entsInCastle = 0;
+	public int totalMovesToClear = 0;
+	public int movesCleared = 0;
 
 	private int gridW;
 	private int gridH;
@@ -67,7 +65,9 @@ public class TurnMan : MonoBehaviour {
 			if (boardMan.entities[x,1] != null)
 			{
 				entitiesFound++;
-				boardMan.entities[x,1].GetComponent<EntityBehavior>().GoToCastle();
+				EntityBehavior entB = boardMan.entities[x,1].GetComponent<EntityBehavior>();
+				totalMovesToClear++;
+				entB.GoToCastle();
 			}
 		}
 
@@ -86,7 +86,10 @@ public class TurnMan : MonoBehaviour {
 				if (boardMan.entities[x,y] != null)
 				{						
 					entitiesFound++;
-					boardMan.entities[x,y].GetComponent<EntityBehavior>().RequestMove();
+					EntityBehavior entb = boardMan.entities[x,y].GetComponent<EntityBehavior>();
+					totalMovesToClear += entb.nmbrOfMoves;
+					//entb.StartCoroutine(entb.RequestMove());
+					entb.ElaborateMove();
 				}
 			}
 		}
@@ -97,10 +100,10 @@ public class TurnMan : MonoBehaviour {
 
 	public bool ContinueTurn()
 	{
-		if(movesCompleted >= movesInitiated)
+		if(movesCleared >= totalMovesToClear)
 		{
-			movesCompleted = 0;
-			movesInitiated = 0;
+			movesCleared = 0;
+			totalMovesToClear = 0;
 			return true;
 		}
 		else
@@ -125,7 +128,6 @@ public class TurnMan : MonoBehaviour {
 	public void GameOver()
 	{
 		Debug.Log("Game Over");
-		//NextTurn();
 	}
 
 
