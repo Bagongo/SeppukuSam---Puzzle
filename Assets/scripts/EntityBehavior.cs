@@ -10,7 +10,7 @@ public class EntityBehavior : MonoBehaviour {
 	public int honorValue;
 	public int scoreValue;
 	public int nmbrOfMoves;
-	public bool nextMoveClear = true;
+	public int movesCompleted = 0;
 	public bool hasKnife;
 	public bool canPickUp;
 	public bool canDrop;
@@ -42,20 +42,37 @@ public class EntityBehavior : MonoBehaviour {
 		currentPos = nextPos;
 		transform.position = grid[currentPos[0], currentPos[1]].transform.position;
 		LookForKnife();	
+		SortNextMove();
+	}
 
+	public void SortNextMove()
+	{
 		if(GetComponent<PlayerBehavior>())
 		{
 			boardMan.playerPos = currentPos;
 			turnMan.NpcsAndEnemiesMove();
 		}
-		else if(currentPos[1] < 1)
+		else if(currentPos[1] == 1 && movesCompleted < nmbrOfMoves)
+		{
+			turnMan.movesCleared += (nmbrOfMoves - movesCompleted);
+			movesCompleted = 0;
+
+			if(turnMan.ContinueTurn())
+				turnMan.AllEntitiesMoved();	
+		}
+		else if(currentPos[1] == 0)
 		{
 			castle.TakeIn(this);
 		}
 		else
 		{
 			turnMan.movesCleared++;
-			nextMoveClear = true;
+			movesCompleted++;
+
+			if(movesCompleted < nmbrOfMoves)
+				ElaborateMove();
+			else 
+				movesCompleted = 0;
 
 			if(turnMan.ContinueTurn())
 				turnMan.AllEntitiesMoved();													
@@ -64,15 +81,21 @@ public class EntityBehavior : MonoBehaviour {
 
     protected IEnumerator SmoothMovement (Vector3 endPos)
     {
-		float sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
+		if(transform.position == endPos)
+			StopCoroutine("SmoothMovement");
 
-		while(sqrRemainingDistance > float.Epsilon)
-        {
-			transform.position = Vector3.MoveTowards(transform.position, endPos, speed * Time.deltaTime);
-			sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
-			
-            yield return null;
-        }
+
+			Debug.Log("smooth movin'!!!!!!");
+
+			float sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
+
+			while(sqrRemainingDistance > 0.001f)
+	        {
+				transform.position = Vector3.MoveTowards(transform.position, endPos, speed * Time.deltaTime);
+				sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
+				
+	            yield return null;
+	        }
 
         FinalizeMovement();
     }
@@ -106,9 +129,7 @@ public class EntityBehavior : MonoBehaviour {
 	{
 		int[] requestedPos = new int[]{currentPos[0]+moveDirection[0], currentPos[1]+moveDirection[1]};
 		int[] newPos;
-
-//		if(requestedPos[1] < 1)
-//			return currentPos;						
+							
 		if(IsInBoundsX(requestedPos))
 		{
 			if(boardMan.entities[requestedPos[0], requestedPos[1]] == null || requestedPos[1] == 0)
@@ -143,48 +164,16 @@ public class EntityBehavior : MonoBehaviour {
 
 	public virtual void ElaborateMove()
 	{
-		nextPos = EvaluateMovement();
-		boardMan.UpdateGrid(currentPos, nextPos);				
-		Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
-		StartCoroutine(SmoothMovement(newPos));
+			nextPos = EvaluateMovement();
+			boardMan.UpdateGrid(currentPos, nextPos);				
+			Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
+			StartCoroutine(SmoothMovement(newPos));
 	}
-
-//	public void RequestMove()
-//	{
-//		for(int i=0; i<nmbrOfMoves; i++)
-//		{
-//			turnMan.movesInitiated++;
-//			ElaborateMove();
-//		}
-//	}
-
-	public IEnumerator RequestMove()
-	{
-			for(int i=0; i<nmbrOfMoves; i++)
-			{
-				ElaborateMove();
-				nextMoveClear = false;
-
-				while(!nextMoveClear)
-				{
-					Debug.Log("holding....");
-					yield return null;
-				}
-			}
-
-			Debug.Log("exited loop...");
-	}
-
 
 	public void GoToCastle()
 	{
-//		turnMan.entsToCastle++;
-//		Vector3 posInCastle = new Vector3(transform.position.x, castle.transform.position.y, 0);
-//		StartCoroutine(SmoothMovement(posInCastle));
-
 		moveDirection = new int[]{0, -1};
 		ElaborateMove();
-
 	}
 
 	public void EliminateEntity()

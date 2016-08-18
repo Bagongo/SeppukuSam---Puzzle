@@ -88,7 +88,8 @@ public class TurnMan : MonoBehaviour {
 					entitiesFound++;
 					EntityBehavior entb = boardMan.entities[x,y].GetComponent<EntityBehavior>();
 					totalMovesToClear += entb.nmbrOfMoves;
-					entb.StartCoroutine(entb.RequestMove());
+					//entb.StartCoroutine(entb.RequestMove());
+					entb.ElaborateMove();
 				}
 			}
 		}

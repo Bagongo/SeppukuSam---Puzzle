@@ -27,27 +27,4 @@ public class Castle : MonoBehaviour {
 //		else
 //			turnMan.GameOver();
 	}
-
-	void OnTriggerEnter2D(Collider2D coll)
-	{
-
-		//Debug.Log(entB.name + " " + entB.currentPos[0] + " " + entB.currentPos[1]);
-
-		EntityBehavior entB = coll.GetComponent<EntityBehavior>();
-
-		scoreMan.HonorAndScoreUpdater(entB, false);
-
-		boardMan.RemoveFromGrid(entB.currentPos);
-
-//		if(turnMan.ContinueGame())
-//		{
-			entB.EliminateEntity();
-			turnMan.movesCleared++;
-
-			if(turnMan.ContinueTurn())
-			{
-				turnMan.NextTurn();
-			}
-	
-	}
 }
