@@ -33,7 +33,6 @@ public class BoardMan : MonoBehaviour {
 				gridSlot.transform.parent = transform;
 				grid[x,y]=gridSlot;
 			}
-
 		}
 
 		transform.position = new Vector3(transform.position.x - grid.GetLength(0)/2, transform.position.y - grid.GetLength(1)/2, 0);
@@ -41,15 +40,30 @@ public class BoardMan : MonoBehaviour {
 
 	void Start(){
 
-		player = Instantiate(playerPrefab, grid[playerPos[0], playerPos[1]].transform.position, Quaternion.identity) as GameObject;
-		entities[playerPos[0],playerPos[1]] = player;
-		player.GetComponent<PlayerBehavior>().currentPos = playerPos;
+		PopulateBoard();
 	}
 
+	void PopulateBoard()
+	{
+		player = Instantiate(playerPrefab, grid[playerPos[0], playerPos[1]].transform.position, Quaternion.identity) as GameObject;
+		entities[playerPos[0], playerPos[1]] = player;
+		player.GetComponent<PlayerBehavior>().currentPos = playerPos;
 
-	public void SpawnRow(Row whatTospawn) //consider delegating type of spawnable choice to other method or brand new spawner in game element...
+		for(int y=1; y<gridH; y++)
+		{
+			if(y==4 || y==6)
+				SpawnRow(Row.npc, y);
+			else if(y== gridH-1)
+				SpawnRow(Row.enemy, y);
+			else 
+				SpawnRow(Row.empty, y);
+		}
+	}
+
+	public void SpawnRow(Row whatTospawn, int y) //consider delegating type of spawnable choice to other method or brand new spawner in game element...
 	{
 		Row whatToSpawn = whatTospawn;
+		int yPos = Mathf.Clamp(y, 1, gridH-1);
 
 		int quantityTofill = 0;
 		int quantityFilled = 0;
@@ -75,13 +89,12 @@ public class BoardMan : MonoBehaviour {
 			GameObject toSpawn = spawnables[Random.Range(0, spawnables.Length)];
 			int posToFill = Random.Range(0, gridW);
 
-			if(entities[posToFill, gridH-1] == null && entities[posToFill, gridH-2] == null)
+			if(entities[posToFill, yPos] == null && entities[posToFill, yPos-1] == null)
 			{	
-				Vector3 spawnPos = grid[posToFill, gridH-1].transform.position;
+				Vector3 spawnPos = grid[posToFill, yPos].transform.position;
 				GameObject newEntity = Instantiate(toSpawn, spawnPos, Quaternion.identity) as GameObject;
-				newEntity.GetComponent<EntityBehavior>().currentPos = new int[]{posToFill, gridH-1};
-				newEntity.GetComponent<EntityBehavior>().LookForKnife();
-				entities[posToFill, gridH-1] = newEntity;
+				newEntity.GetComponent<EntityBehavior>().currentPos = new int[]{posToFill, yPos};
+				entities[posToFill, yPos] = newEntity;
 				quantityFilled++ ;
 			}
 		}

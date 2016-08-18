@@ -30,9 +30,9 @@ public class TurnMan : MonoBehaviour {
 
 		player = FindObjectOfType<PlayerBehavior>();					
 
-		turnNmr = 1;
+		turnNmr = 7;
 
-		boardMan.SpawnRow(WhatTypeOfRow(turnNmr));
+		//boardMan.SpawnRow(WhatTypeOfRow(turnNmr));
 
 //		for(int i=0; i<=turnsAtSetup; i++)
 //		{
@@ -88,7 +88,6 @@ public class TurnMan : MonoBehaviour {
 					entitiesFound++;
 					EntityBehavior entb = boardMan.entities[x,y].GetComponent<EntityBehavior>();
 					totalMovesToClear += entb.nmbrOfMoves;
-					//entb.StartCoroutine(entb.RequestMove());
 					entb.ElaborateMove();
 				}
 			}
@@ -121,7 +120,7 @@ public class TurnMan : MonoBehaviour {
 	public void NextTurn()
 	{
 		turnNmr++;
-		boardMan.SpawnRow(WhatTypeOfRow(turnNmr));
+		boardMan.SpawnRow(WhatTypeOfRow(turnNmr), gridH-1);
 		player.playerBlocked = false;	
 	}
 

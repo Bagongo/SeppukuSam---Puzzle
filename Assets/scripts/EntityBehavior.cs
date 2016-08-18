@@ -159,6 +159,7 @@ public class EntityBehavior : MonoBehaviour {
 
 	public virtual void ElaborateMove()
 	{
+			LookForKnife();
 			nextPos = EvaluateMovement();
 			boardMan.UpdateGrid(currentPos, nextPos);				
 			Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
