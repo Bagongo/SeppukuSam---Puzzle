@@ -39,6 +39,7 @@ public class EntityBehavior : MonoBehaviour {
 
 	public void FinalizeMovement()
 	{
+		StopCoroutine("SmoothMovement");
 		currentPos = nextPos;
 		transform.position = grid[currentPos[0], currentPos[1]].transform.position;
 		LookForKnife();	
@@ -81,21 +82,15 @@ public class EntityBehavior : MonoBehaviour {
 
     protected IEnumerator SmoothMovement (Vector3 endPos)
     {
-		if(transform.position == endPos)
-			StopCoroutine("SmoothMovement");
+		float sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
 
-
-			Debug.Log("smooth movin'!!!!!!");
-
-			float sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
-
-			while(sqrRemainingDistance > 0.001f)
-	        {
-				transform.position = Vector3.MoveTowards(transform.position, endPos, speed * Time.deltaTime);
-				sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
-				
-	            yield return null;
-	        }
+		while(sqrRemainingDistance > 0.001f)
+        {
+			transform.position = Vector3.MoveTowards(transform.position, endPos, speed * Time.deltaTime);
+			sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
+			
+            yield return null;
+        }
 
         FinalizeMovement();
     }
