@@ -64,14 +64,14 @@ public class PlayerBehavior : EntityBehavior {
 		StartCoroutine(SmoothMovement(newPos));
 	}
 
-	public void Attack()
+	public override void Attack(int[] targetPos)
 	{
 
 		//Debug.Log("player Attacking....");
 		//animation here or something else...
-		if(boardMan.entities[currentPos[0], currentPos[1] + 1] != null)
+		if(boardMan.entities[targetPos[0], targetPos[1]] != null)
 		{
-			EntityBehavior target = boardMan.entities[currentPos[0], currentPos[1] + 1].GetComponent<EntityBehavior>();
+			EntityBehavior target = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
 			scoreMan.HonorAndScoreUpdater(target, true);
 			target.EliminateEntity();
 		}

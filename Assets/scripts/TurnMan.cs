@@ -31,14 +31,6 @@ public class TurnMan : MonoBehaviour {
 		player = FindObjectOfType<PlayerBehavior>();					
 
 		turnNmr = 7;
-
-		//boardMan.SpawnRow(WhatTypeOfRow(turnNmr));
-
-//		for(int i=0; i<=turnsAtSetup; i++)
-//		{
-//			NpcsAndEnemiesMove();
-//			NextTurn();
-//		}
 	}
 
 	Row WhatTypeOfRow(int turnNmr)
@@ -53,7 +45,7 @@ public class TurnMan : MonoBehaviour {
 
 	public void AllEntitiesMoved()
 	{
-		player.Attack();
+		player.Attack(new int[]{player.currentPos[0], player.currentPos[1]+1});
 	}
 
 	public void ResolveFirstRow()

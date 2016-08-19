@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public interface IEntity {
+public interface IAttacker{
 
+	 void Attack();
 
 }

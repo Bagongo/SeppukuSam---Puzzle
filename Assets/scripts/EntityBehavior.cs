@@ -7,8 +7,10 @@ public class EntityBehavior : MonoBehaviour {
 	public int[] currentPos;
 	public int[] nextPos;
 	public int[] moveDirection;
+	public int movePower;
 	public int honorValue;
 	public int scoreValue;
+	public Color moveColor;
 	public int nmbrOfMoves;
 	public int movesCompleted = 0;
 	public bool hasKnife;
@@ -42,6 +44,7 @@ public class EntityBehavior : MonoBehaviour {
 		StopCoroutine("SmoothMovement");
 		currentPos = nextPos;
 		transform.position = grid[currentPos[0], currentPos[1]].transform.position;
+		grid[currentPos[0], currentPos[1]].GetComponent<SpriteRenderer>().color = Color.white;
 		LookForKnife();	
 		SortNextMove();
 	}
@@ -55,8 +58,7 @@ public class EntityBehavior : MonoBehaviour {
 		}
 		else if(currentPos[1] == 1 && movesCompleted < nmbrOfMoves)
 		{
-			turnMan.movesCleared += (nmbrOfMoves - movesCompleted);
-			movesCompleted = 0;
+			EraseRemainingMoves();
 
 			if(turnMan.ContinueTurn())
 				turnMan.AllEntitiesMoved();	
@@ -78,6 +80,12 @@ public class EntityBehavior : MonoBehaviour {
 			if(turnMan.ContinueTurn())
 				turnMan.AllEntitiesMoved();													
 		}
+	}
+
+	public void EraseRemainingMoves()
+	{
+		turnMan.movesCleared += (nmbrOfMoves - movesCompleted);
+		movesCompleted = 0;
 	}
 
     protected IEnumerator SmoothMovement (Vector3 endPos)
@@ -129,6 +137,11 @@ public class EntityBehavior : MonoBehaviour {
 		{
 			if(boardMan.entities[requestedPos[0], requestedPos[1]] == null || requestedPos[1] == 0)
 				newPos = requestedPos;
+			else if(boardMan.entities[requestedPos[0], requestedPos[1]] != null && movePower > 2)
+			{
+				Attack(requestedPos);
+				newPos = requestedPos;
+			}
 			else
 			{
 				int tryNeighborAt = Random.value <= .5 ? 1 : -1;
@@ -161,6 +174,7 @@ public class EntityBehavior : MonoBehaviour {
 	{
 			LookForKnife();
 			nextPos = EvaluateMovement();
+			grid[nextPos[0], nextPos[1]].GetComponent<SpriteRenderer>().color = moveColor;
 			boardMan.UpdateGrid(currentPos, nextPos);				
 			Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
 			StartCoroutine(SmoothMovement(newPos));
@@ -172,12 +186,19 @@ public class EntityBehavior : MonoBehaviour {
 		ElaborateMove();
 	}
 
+	public virtual void Attack(int[] targetPos)
+	{
+		EntityBehavior entB = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
+		entB.EraseRemainingMoves();
+		entB.EliminateEntity();
+	}
+
 	public void EliminateEntity()
 	{
 		if(hasKnife && canDrop)
-			boardMan.DropKnife(currentPos);
+			boardMan.DropKnife(nextPos);
 
-		boardMan.RemoveFromGrid(currentPos);
+		boardMan.RemoveFromGrid(nextPos);
 		Destroy(this.gameObject);	
 	}
 }
