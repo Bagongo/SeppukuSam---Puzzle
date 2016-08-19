@@ -9,9 +9,10 @@ public class ScoreMan : MonoBehaviour {
 	public GameObject scoreTag;
 	public GameObject honorTagPos;
 	public GameObject honorTagNeg;
-
+	public float fadeTime = 0.02f;
 	public int score = 0;
 	public int honor = 5;
+	public int maxHonor = 5;
 
 	void Start () {
 
@@ -37,10 +38,11 @@ public class ScoreMan : MonoBehaviour {
 			else
 			{
 				honor -= entB.honorValue;
-				PrintScore(entB.honorValue, 0, entB.transform.position);
+				PrintScore(-entB.honorValue, 0, entB.transform.position);
 			}
 		}
 
+		honor = Mathf.Clamp(honor, 0, maxHonor);
 
 		scoreDisplayer.text = "Score: " +  score;
 		honorDisplayer.text = "Honor: " + honor;
@@ -54,9 +56,8 @@ public class ScoreMan : MonoBehaviour {
 
 		while(newCol.a > 0)
         {
-			//opacity -= 0.01f;
-			posY += 0.01f;
-			newCol = new Color(newCol.r, newCol.g, newCol.b, newCol.a - 0.01f);
+			posY += fadeTime;
+			newCol = new Color(newCol.r, newCol.g, newCol.b, newCol.a - fadeTime);
 
 			tag.GetComponent<TextMesh>().color = newCol;
 			tag.transform.position = new Vector3(tag.transform.position.x, posY, tag.transform.position.z);
