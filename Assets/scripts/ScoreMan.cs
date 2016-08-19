@@ -6,6 +6,9 @@ public class ScoreMan : MonoBehaviour {
 
 	public Text scoreDisplayer;
 	public Text honorDisplayer;
+	public GameObject scoreTag;
+	public GameObject honorTagPos;
+	public GameObject honorTagNeg;
 
 	public int score = 0;
 	public int honor = 5;
@@ -20,21 +23,75 @@ public class ScoreMan : MonoBehaviour {
 	{
 		if(fromPlayer)
 		{
-			if(entB.tag == "enemy")
-				score += entB.scoreValue;
-
 			honor += entB.honorValue;
+			PrintScore(entB.honorValue, 0, entB.transform.position);
 		}
 		else
 		{
 			if(entB.tag == "npc")
+			{
 				score += entB.scoreValue;
+				PrintScore(0, entB.scoreValue, entB.transform.position);
+			}
+
 			else
+			{
 				honor -= entB.honorValue;
+				PrintScore(entB.honorValue, 0, entB.transform.position);
+			}
 		}
+
 
 		scoreDisplayer.text = "Score: " +  score;
 		honorDisplayer.text = "Honor: " + honor;
 
 	}
+
+	IEnumerator FadeMoveTag (GameObject tag)
+    {
+		Color newCol = tag.GetComponent<TextMesh>().color;
+		float posY = tag.transform.position.y;
+
+		while(newCol.a > 0)
+        {
+			//opacity -= 0.01f;
+			posY += 0.01f;
+			newCol = new Color(newCol.r, newCol.g, newCol.b, newCol.a - 0.01f);
+
+			tag.GetComponent<TextMesh>().color = newCol;
+			tag.transform.position = new Vector3(tag.transform.position.x, posY, tag.transform.position.z);
+			
+            yield return null;
+        }
+
+        Destroy(tag);
+		StopCoroutine("FadeMoveTag");
+    }
+
+	void PrintScore(int honor, int score, Vector3 entPos)
+	{
+		GameObject tag;
+		Color color; 
+		GameObject tagToDisplay;
+		Vector3 pos = new Vector3(entPos.x, entPos.y + 0.2f, -1);
+
+		if(honor != 0)
+		{
+			tag = honor < 0 ? honorTagNeg : honorTagPos;
+			tagToDisplay = Instantiate(tag, pos, Quaternion.identity) as GameObject;
+		}
+		else
+		{
+			tag = scoreTag;
+			color = score > 0 ? Color.green : Color.red;
+			string appendToTag = score > 0 ? "+" : "";
+			tagToDisplay = Instantiate(tag, pos, Quaternion.identity) as GameObject;
+			tagToDisplay.GetComponent<TextMesh>().text = appendToTag + score.ToString();
+			tagToDisplay.GetComponent<TextMesh>().color = color;
+		}
+
+		StartCoroutine(FadeMoveTag(tagToDisplay));
+	}
+
+
 }
