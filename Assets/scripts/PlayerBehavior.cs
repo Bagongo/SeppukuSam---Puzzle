@@ -1,25 +1,55 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum PlayerMoves {left, right, still, knife};
 
 public class PlayerBehavior : EntityBehavior {
 
+	public int movesCollected = 0;
+	public List <PlayerMoves> moves;
 	public bool playerBlocked = false;
+
 
 	void Update () {
 
 		if(!playerBlocked)
 		{
 		if(Input.GetKeyDown("left"))
-			ParseCommand(PlayerMoves.left);
+			MovesCollector(PlayerMoves.left);
 		else if(Input.GetKeyDown("right"))
-			ParseCommand(PlayerMoves.right);
+			MovesCollector(PlayerMoves.right);
 		else if (Input.GetKeyDown("space"))
-			ParseCommand(PlayerMoves.still);
-		else if(Input.GetKeyDown("up") && hasKnife)
-			ParseCommand(PlayerMoves.knife);
+			MovesCollector(PlayerMoves.still);
+		else if(Input.GetKeyDown("up") && hasKnife)  //handle !hasknife in multimovement!!!!!!!!!!
+			MovesCollector(PlayerMoves.knife);
 		}
+	}
+
+	void MovesCollector(PlayerMoves move)
+	{
+		moves.Add(move);
+
+		if(moves.Count >= nmbrOfMoves)
+			StartCoroutine("ExecuteMoves");
+	}
+
+	public IEnumerator ExecuteMoves()
+	{
+		foreach(PlayerMoves m in moves)
+		{		
+			ParseCommand(m);
+
+			while(playerBlocked)
+			{
+				Debug.Log("holding!!!");
+				yield return new WaitForSeconds(0.01f);
+			}
+		}
+
+		movesCollected = 0;
+		moves = new List<PlayerMoves>();
+		StopCoroutine("ExecuteMoves");
 	}
 
 	void ParseCommand(PlayerMoves move)
