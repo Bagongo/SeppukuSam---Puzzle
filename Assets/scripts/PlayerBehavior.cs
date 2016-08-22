@@ -15,20 +15,38 @@ public class PlayerBehavior : EntityBehavior {
 
 		if(!playerBlocked)
 		{
-		if(Input.GetKeyDown("left"))
-			MovesCollector(PlayerMoves.left);
-		else if(Input.GetKeyDown("right"))
-			MovesCollector(PlayerMoves.right);
-		else if (Input.GetKeyDown("space"))
-			MovesCollector(PlayerMoves.still);
-		else if(Input.GetKeyDown("up") && hasKnife)  //handle !hasknife in multimovement!!!!!!!!!!
-			MovesCollector(PlayerMoves.knife);
+			if(Input.GetKeyDown("left"))
+				MovesCollector(PlayerMoves.left);
+			else if(Input.GetKeyDown("right"))
+				MovesCollector(PlayerMoves.right);
+			else if (Input.GetKeyDown("space"))
+				MovesCollector(PlayerMoves.still);
+			else if(Input.GetKeyDown("up"))
+			{  
+				if(hasKnife)
+				{
+					hasKnife = false;
+					MovesCollector(PlayerMoves.knife);
+				}
+				else
+					Debug.Log("Doesn't have knife...");
+			}
+
 		}
 	}
 
-	void MovesCollector(PlayerMoves move)
+	public void MovesCollector(PlayerMoves move)
 	{
 		moves.Add(move);
+
+		if(moves.Count >= nmbrOfMoves)
+			StartCoroutine("ExecuteMoves");
+	}
+
+	public void MovesCollector(int moveIdx)
+	{
+		Debug.Log("called from button.........");
+		moves.Add((PlayerMoves)moveIdx);
 
 		if(moves.Count >= nmbrOfMoves)
 			StartCoroutine("ExecuteMoves");
@@ -41,10 +59,7 @@ public class PlayerBehavior : EntityBehavior {
 			ParseCommand(m);
 
 			while(playerBlocked)
-			{
-				Debug.Log("holding!!!");
 				yield return new WaitForSeconds(0.01f);
-			}
 		}
 
 		movesCollected = 0;
@@ -97,7 +112,7 @@ public class PlayerBehavior : EntityBehavior {
 	public override void Attack(int[] targetPos)
 	{
 
-		//Debug.Log("player Attacking....");
+		Debug.Log("player Attacking....");
 		//animation here or something else...
 		if(boardMan.entities[targetPos[0], targetPos[1]] != null)
 		{
