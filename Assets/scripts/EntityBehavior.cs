@@ -128,6 +128,20 @@ public class EntityBehavior : MonoBehaviour {
 			return false;
 	}
 
+	int[] TryNeighbor(int[] requestedPos, int at)
+	{
+		int[] availablePos;
+
+		if(IsInBoundsX(new int[]{requestedPos[0] - at, requestedPos[1]}) && boardMan.entities[requestedPos[0] - at, requestedPos[1]] == null)
+			availablePos = new int[] {requestedPos[0] - at, requestedPos[1]}; 
+		else if(IsInBoundsX(new int[]{requestedPos[0] + at, requestedPos[1]}) && boardMan.entities[requestedPos[0] + at, requestedPos[1]] == null)
+			availablePos = new int[] {requestedPos[0] + at, requestedPos[1]}; 
+		else
+			availablePos = new int[] {currentPos[0], currentPos[1]};
+
+		return availablePos;
+	}
+
 	public int[] EvaluateMovement()
 	{
 		int[] requestedPos = new int[]{currentPos[0]+moveDirection[0], currentPos[1]+moveDirection[1]};
@@ -143,18 +157,7 @@ public class EntityBehavior : MonoBehaviour {
 				newPos = requestedPos;
 			}
 			else
-			{
-				int tryNeighborAt = Random.value <= .5 ? 1 : -1;
-
-				if(IsInBoundsX(new int[]{requestedPos[0] - tryNeighborAt, requestedPos[1]}) && boardMan.entities[requestedPos[0] - tryNeighborAt, requestedPos[1]] == null)
-					newPos = new int[] {requestedPos[0] - tryNeighborAt, requestedPos[1]}; 
-				else if(IsInBoundsX(new int[]{requestedPos[0] + tryNeighborAt, requestedPos[1]}) && boardMan.entities[requestedPos[0] + tryNeighborAt, requestedPos[1]] == null)
-					newPos = new int[] {requestedPos[0] + tryNeighborAt, requestedPos[1]}; 
-				else
-				{
-					newPos = new int[] {currentPos[0], currentPos[1]};
-				}	
-			} 
+				newPos = TryNeighbor(requestedPos, Random.value <= .5 ? 1 : -1); 
 		}
 		else
 		{

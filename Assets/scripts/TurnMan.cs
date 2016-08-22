@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System;
+using System.Linq;
 
 public enum Row {empty, npc, enemy};
 
@@ -70,6 +73,7 @@ public class TurnMan : MonoBehaviour {
 	public void NpcsAndEnemiesMove()
 	{
 		int entitiesFound = 0;
+		List<EntityBehavior> entBs = new List<EntityBehavior>();
 
 		for(int y=2; y<gridH; y++)
 		{
@@ -80,9 +84,20 @@ public class TurnMan : MonoBehaviour {
 					entitiesFound++;
 					EntityBehavior entb = boardMan.entities[x,y].GetComponent<EntityBehavior>();
 					totalMovesToClear += entb.nmbrOfMoves;
-					entb.ElaborateMove();
+					entBs.Add(entb);
+					//entb.ElaborateMove();
 				}
 			}
+
+			entBs = entBs.OrderByDescending(ent => ent.movePower).ToList();
+
+//			foreach(EntityBehavior ent in entBs)
+//				Debug.Log(ent);
+
+			foreach(EntityBehavior ent in entBs)
+				ent.ElaborateMove();
+
+			entBs = new List<EntityBehavior>();
 		}
 
 		if(entitiesFound < 1)

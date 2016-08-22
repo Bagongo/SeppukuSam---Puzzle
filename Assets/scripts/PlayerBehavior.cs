@@ -45,7 +45,6 @@ public class PlayerBehavior : EntityBehavior {
 
 	public void MovesCollector(int moveIdx)
 	{
-		Debug.Log("called from button.........");
 		moves.Add((PlayerMoves)moveIdx);
 
 		if(moves.Count >= nmbrOfMoves)
@@ -112,7 +111,7 @@ public class PlayerBehavior : EntityBehavior {
 	public override void Attack(int[] targetPos)
 	{
 
-		Debug.Log("player Attacking....");
+		//Debug.Log("player Attacking....");
 		//animation here or something else...
 		if(boardMan.entities[targetPos[0], targetPos[1]] != null)
 		{
