@@ -3,6 +3,6 @@ using System.Collections;
 
 public interface IAttacker{
 
-	 void Attack();
+	 void Attack(int[] targetPOs);
 
 }

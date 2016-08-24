@@ -13,21 +13,24 @@ public class ActionButton : MonoBehaviour {
 	{
 		player = FindObjectOfType<PlayerBehavior>();
 		btn = GetComponent<Button>();
-		btn.onClick.AddListener(TriggerFoo);
+		btn.onClick.AddListener(TriggerBtn);
 	}
 
-	public void TriggerFoo()
+	public void TriggerBtn()
 	{
-		player = FindObjectOfType<PlayerBehavior>(); //find better solution....
+		//player = FindObjectOfType<PlayerBehavior>(); //find better solution....
 
-		if(!player.playerBlocked)
+		if(player.movesCollected < player.nmbrOfMoves)
 		{
-			if(move == PlayerMoves.knife && !player.hasKnife)
-				Debug.Log("Doesn't have knife");
-			else if(move == PlayerMoves.knife && player.hasKnife)
+			if(move == PlayerMoves.knife)
 			{
-				player.hasKnife = false;
-				player.MovesCollector(move);
+				if(!player.hasKnife)
+					Debug.Log("Doesn't have knife");
+				else
+				{
+					player.hasKnife = false;
+					player.MovesCollector(move);
+				}
 			}
 			else
 				player.MovesCollector(move);

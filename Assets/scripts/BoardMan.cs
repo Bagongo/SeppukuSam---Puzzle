@@ -46,7 +46,10 @@ public class BoardMan : MonoBehaviour {
 	void PopulateBoard()
 	{
 		player = Instantiate(playerPrefab, grid[playerPos[0], playerPos[1]].transform.position, Quaternion.identity) as GameObject;
-		entities[playerPos[0], playerPos[1]] = player;
+
+		//reactivate in case player row consider player as unity (null and recreate on each move)........
+		//entities[playerPos[0], playerPos[1]] = player;
+
 		player.GetComponent<PlayerBehavior>().currentPos = playerPos;
 
 		for(int y=1; y<gridH; y++)
@@ -111,9 +114,8 @@ public class BoardMan : MonoBehaviour {
 			if(entities[x,i] != null)
 			{
 				EntityBehavior entB = entities[x,i].GetComponent<EntityBehavior>();
-				DropKnife(pos);	
-				RemoveFromGrid(pos); //should call method 'killSmething' once it's ready....
 				entB.EliminateEntity();
+				DropKnife(pos);	
 				break;
 			}
 			else if(i == gridH-1 && entities[x,i] == null)
@@ -142,8 +144,8 @@ public class BoardMan : MonoBehaviour {
 
 	public void RemoveFromGrid(int[] pos)
 	{
-		//Destroy(entities[pos[0], pos[1]].gameObject);
-		entities[pos[0], pos[1]] = null;												
+		if(entities[pos[0], pos[1]] != null)
+			entities[pos[0], pos[1]] = null;												
 	}
 
 	float Choose (float[] probs) 

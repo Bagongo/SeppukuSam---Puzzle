@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public enum PlayerMoves {left, right, still, knife};
 
-public class PlayerBehavior : EntityBehavior {
+public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 
 	public int movesCollected = 0;
 	public List <PlayerMoves> moves;
@@ -13,7 +13,7 @@ public class PlayerBehavior : EntityBehavior {
 
 	void Update () {
 
-		if(!playerBlocked)
+		if(movesCollected < nmbrOfMoves)
 		{
 			if(Input.GetKeyDown("left"))
 				MovesCollector(PlayerMoves.left);
@@ -38,6 +38,7 @@ public class PlayerBehavior : EntityBehavior {
 	public void MovesCollector(PlayerMoves move)
 	{
 		moves.Add(move);
+		movesCollected++;
 
 		if(moves.Count >= nmbrOfMoves)
 			StartCoroutine("ExecuteMoves");
@@ -46,6 +47,7 @@ public class PlayerBehavior : EntityBehavior {
 	public void MovesCollector(int moveIdx)
 	{
 		moves.Add((PlayerMoves)moveIdx);
+		movesCollected++;
 
 		if(moves.Count >= nmbrOfMoves)
 			StartCoroutine("ExecuteMoves");
@@ -54,22 +56,22 @@ public class PlayerBehavior : EntityBehavior {
 	public IEnumerator ExecuteMoves()
 	{
 		foreach(PlayerMoves m in moves)
-		{		
+		{	
+			playerBlocked = true;	
 			ParseCommand(m);
 
 			while(playerBlocked)
 				yield return new WaitForSeconds(0.01f);
 		}
 
+		movesCompleted = 0;
 		movesCollected = 0;
 		moves = new List<PlayerMoves>();
 		StopCoroutine("ExecuteMoves");
 	}
 
 	void ParseCommand(PlayerMoves move)
-	{	
-		playerBlocked = true;
-										
+	{										
 		switch(move)
 		{
 			case PlayerMoves.still:
@@ -91,26 +93,29 @@ public class PlayerBehavior : EntityBehavior {
 		ElaborateMove();
 	}
 
-	public override void ElaborateMove()
+	public int[] EvaluateMovement()
 	{
 		int[] requestedPos = new int[]{currentPos[0]+moveDirection[0], currentPos[1]};
-
+		int[] newPos;
+							
 		if(IsInBoundsX(requestedPos))
-			nextPos = requestedPos;
+			newPos = requestedPos;	
 		else
-		{
-			Debug.Log("invalid move requested...");
-			nextPos = currentPos;
-		}
+			newPos = currentPos;	
 
-		boardMan.UpdateGrid(currentPos, nextPos);				
+		return newPos;
+	}
+
+	public override void ElaborateMove()
+	{
+		nextPos = EvaluateMovement();
+		//boardMan.UpdateGrid(currentPos, nextPos);   reactivate in case player row considers player as board unity (null and recreate on each move)........				
 		Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
 		StartCoroutine(SmoothMovement(newPos));
 	}
 
-	public override void Attack(int[] targetPos)
+	public void Attack(int[] targetPos)
 	{
-
 		//Debug.Log("player Attacking....");
 		//animation here or something else...
 		if(boardMan.entities[targetPos[0], targetPos[1]] != null)

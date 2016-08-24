@@ -85,14 +85,10 @@ public class TurnMan : MonoBehaviour {
 					EntityBehavior entb = boardMan.entities[x,y].GetComponent<EntityBehavior>();
 					totalMovesToClear += entb.nmbrOfMoves;
 					entBs.Add(entb);
-					//entb.ElaborateMove();
 				}
 			}
 
-			entBs = entBs.OrderByDescending(ent => ent.movePower).ToList();
-
-//			foreach(EntityBehavior ent in entBs)
-//				Debug.Log(ent);
+			entBs = entBs.OrderBy(ent => ent.movePriority).ToList();
 
 			foreach(EntityBehavior ent in entBs)
 				ent.ElaborateMove();

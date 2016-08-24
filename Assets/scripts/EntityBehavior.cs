@@ -7,12 +7,13 @@ public class EntityBehavior : MonoBehaviour {
 	public int[] currentPos;
 	public int[] nextPos;
 	public int[] moveDirection;
-	public int movePower;
+	public int movePriority;
 	public int honorValue;
 	public int scoreValue;
 	public Color moveColor;
 	public int nmbrOfMoves;
 	public int movesCompleted = 0;
+	public bool isMoving = false;
 	public bool hasKnife;
 	public bool canPickUp;
 	public bool canDrop;
@@ -36,12 +37,13 @@ public class EntityBehavior : MonoBehaviour {
 
 		turnMan = (TurnMan)FindObjectOfType(typeof(TurnMan));
 		scoreMan = (ScoreMan)FindObjectOfType(typeof(ScoreMan));
-		castle = (Castle)FindObjectOfType(typeof(Castle));			
+		castle = (Castle)FindObjectOfType(typeof(Castle));	
 	}
 
 	public void FinalizeMovement()
 	{
 		StopCoroutine("SmoothMovement");
+		isMoving = false;
 		currentPos = nextPos;
 		transform.position = grid[currentPos[0], currentPos[1]].transform.position;
 		grid[currentPos[0], currentPos[1]].GetComponent<SpriteRenderer>().color = Color.white;
@@ -54,6 +56,7 @@ public class EntityBehavior : MonoBehaviour {
 		if(GetComponent<PlayerBehavior>())
 		{
 			boardMan.playerPos = currentPos;
+			movesCompleted++;
 			turnMan.NpcsAndEnemiesMove();
 		}
 		else if(currentPos[1] == 1 && movesCompleted < nmbrOfMoves)
@@ -120,15 +123,7 @@ public class EntityBehavior : MonoBehaviour {
 			return false;
 	}
 
-	public bool IsInBoundsY(int[] requestedPos)
-	{
-		if(requestedPos[1] > 0 && requestedPos[1] < gridH)
-			return true;
-		else 
-			return false;
-	}
-
-	int[] TryNeighbor(int[] requestedPos, int at)
+	public int[] TryNeighbor(int[] requestedPos, int at)
 	{
 		int[] availablePos;
 
@@ -142,66 +137,53 @@ public class EntityBehavior : MonoBehaviour {
 		return availablePos;
 	}
 
-	public int[] EvaluateMovement()
-	{
-		int[] requestedPos = new int[]{currentPos[0]+moveDirection[0], currentPos[1]+moveDirection[1]};
-		int[] newPos;
-							
-		if(IsInBoundsX(requestedPos))
-		{
-			if(boardMan.entities[requestedPos[0], requestedPos[1]] == null || requestedPos[1] == 0)
-				newPos = requestedPos;
-			else if(boardMan.entities[requestedPos[0], requestedPos[1]] != null && movePower > 2)
-			{
-				Attack(requestedPos);
-				newPos = requestedPos;
-			}
-			else
-				newPos = TryNeighbor(requestedPos, Random.value <= .5 ? 1 : -1); 
-		}
-		else
-		{
-			if(moveDirection[0] != 0)
-			{
-				moveDirection[0] = - moveDirection[0];
-				return EvaluateMovement();
-			}
-
-			newPos = currentPos;	
-		}
-
-		return newPos;
-	}
-
 	public virtual void ElaborateMove()
 	{
+		if(this is IMovable)
+		{
 			LookForKnife();
-			nextPos = EvaluateMovement();
+			nextPos = GetComponent<IMovable>().EvaluateMovement();
+			//GetComponent<IMovable>().Test();
 			grid[nextPos[0], nextPos[1]].GetComponent<SpriteRenderer>().color = moveColor;
 			boardMan.UpdateGrid(currentPos, nextPos);				
 			Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
+			isMoving = true;
 			StartCoroutine(SmoothMovement(newPos));
+		}
+		else 
+		{
+			Debug.Log("This entity can't make a move....");
+		}
 	}
 
 	public void GoToCastle()
 	{
-		moveDirection = new int[]{0, -1};
-		ElaborateMove();
-	}
+		//reactivate in case player row considers player as board unity (null and recreate on each move)........				
+//		moveDirection = new int[]{0, -1}; 
+//		ElaborateMove();
 
-	public virtual void Attack(int[] targetPos)
-	{
-		EntityBehavior entB = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
-		entB.EraseRemainingMoves();
-		entB.EliminateEntity();
+		nextPos = new int[]{currentPos[0], currentPos[1] - 1};
+		boardMan.UpdateGrid(currentPos, nextPos);
+		Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
+		StartCoroutine(SmoothMovement(newPos));
 	}
 
 	public void EliminateEntity()
 	{
+		int[] posToEliminateAt = isMoving ? nextPos : currentPos;
+
+		if(isMoving)
+		{
+			posToEliminateAt = nextPos;
+			EraseRemainingMoves();
+		}
+		else
+			posToEliminateAt = currentPos;
+
 		if(hasKnife && canDrop)
-			boardMan.DropKnife(nextPos);
+			boardMan.DropKnife(posToEliminateAt);
 
 		Destroy(this.gameObject);	
-		boardMan.RemoveFromGrid(nextPos);
+		boardMan.RemoveFromGrid(posToEliminateAt);
 	}
 }
