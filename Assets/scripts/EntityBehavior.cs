@@ -14,6 +14,7 @@ public class EntityBehavior : MonoBehaviour {
 	public int nmbrOfMoves;
 	public int movesCompleted = 0;
 	public bool isMoving = false;
+	//public bool isMutant = false;
 	public bool hasKnife;
 	public bool canPickUp;
 	public bool canDrop;
@@ -25,7 +26,7 @@ public class EntityBehavior : MonoBehaviour {
 	public int gridW;
 	public int gridH;
 	public Castle castle;
-	public float speed = 10f;
+	public float speed;
 
 	protected virtual void Awake()
 	{
@@ -42,7 +43,6 @@ public class EntityBehavior : MonoBehaviour {
 
 	public void FinalizeMovement()
 	{
-		StopCoroutine("SmoothMovement");
 		isMoving = false;
 		currentPos = nextPos;
 		transform.position = grid[currentPos[0], currentPos[1]].transform.position;
@@ -91,7 +91,13 @@ public class EntityBehavior : MonoBehaviour {
 		movesCompleted = 0;
 	}
 
-    protected IEnumerator SmoothMovement (Vector3 endPos)
+	public void CompensateMoves(int howManyMovesToBeLeft)
+	{
+		movesCompleted = nmbrOfMoves - howManyMovesToBeLeft;
+		turnMan.movesCleared += movesCompleted;
+	}
+
+    public IEnumerator SmoothMovement (Vector3 endPos)
     {
 		float sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
 
@@ -123,9 +129,10 @@ public class EntityBehavior : MonoBehaviour {
 			return false;
 	}
 
-	public int[] TryNeighbor(int[] requestedPos, int at)
+	public int[] TryNeighbor(int[] requestedPos)
 	{
 		int[] availablePos;
+		int at = Random.value < 0.5 ? 1 : -1;
 
 		if(IsInBoundsX(new int[]{requestedPos[0] - at, requestedPos[1]}) && boardMan.entities[requestedPos[0] - at, requestedPos[1]] == null)
 			availablePos = new int[] {requestedPos[0] - at, requestedPos[1]}; 
@@ -143,7 +150,6 @@ public class EntityBehavior : MonoBehaviour {
 		{
 			LookForKnife();
 			nextPos = GetComponent<IMovable>().EvaluateMovement();
-			//GetComponent<IMovable>().Test();
 			grid[nextPos[0], nextPos[1]].GetComponent<SpriteRenderer>().color = moveColor;
 			boardMan.UpdateGrid(currentPos, nextPos);				
 			Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;

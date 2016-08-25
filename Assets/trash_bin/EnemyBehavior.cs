@@ -18,7 +18,7 @@ public class EnemyBehavior : EntityBehavior, IMovable, IAttacker{
 			else if(boardMan.entities[requestedPos[0], requestedPos[1]] == null)
 				newPos = requestedPos;
 			else
-				newPos = TryNeighbor(requestedPos, Random.value <= .5 ? 1 : -1); 
+				newPos = TryNeighbor(requestedPos); 
 		}
 		else
 		{
@@ -34,5 +34,6 @@ public class EnemyBehavior : EntityBehavior, IMovable, IAttacker{
 		EntityBehavior entB = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
 		entB.EliminateEntity();
 	}
+
 		
 }

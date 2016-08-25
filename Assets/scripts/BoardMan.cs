@@ -90,17 +90,23 @@ public class BoardMan : MonoBehaviour {
 		while(quantityTofill > quantityFilled)
 		{
 			GameObject toSpawn = spawnables[Random.Range(0, spawnables.Length)];
-			int posToFill = Random.Range(0, gridW);
+			int xPos = Random.Range(0, gridW);
 
-			if(entities[posToFill, yPos] == null && entities[posToFill, yPos-1] == null)
+			if(entities[xPos, yPos] == null && entities[xPos, yPos-1] == null)
 			{	
-				Vector3 spawnPos = grid[posToFill, yPos].transform.position;
-				GameObject newEntity = Instantiate(toSpawn, spawnPos, Quaternion.identity) as GameObject;
-				newEntity.GetComponent<EntityBehavior>().currentPos = new int[]{posToFill, yPos};
-				entities[posToFill, yPos] = newEntity;
+				InstantiateSingleEntity(toSpawn, new int[]{xPos, yPos});
 				quantityFilled++ ;
 			}
 		}
+	}
+
+	public void InstantiateSingleEntity(GameObject toSpawn, int[] atPos)
+	{
+		Vector3 spawnPos = grid[atPos[0], atPos[1]].transform.position;
+		GameObject newEntity = Instantiate(toSpawn, spawnPos, Quaternion.identity) as GameObject;
+		EntityBehavior entB = newEntity.GetComponent<EntityBehavior>();
+		entB.currentPos = new int[]{atPos[0], atPos[1]};
+		entities[atPos[0], atPos[1]] = newEntity;
 	}
 
 	public void KnifeImpact()

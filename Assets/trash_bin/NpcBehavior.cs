@@ -13,7 +13,7 @@ public class NpcBehavior : EntityBehavior, IMovable {
 			if(boardMan.entities[requestedPos[0], requestedPos[1]] == null)
 				newPos = requestedPos;
 			else
-				newPos = TryNeighbor(requestedPos, Random.value <= .5 ? 1 : -1); 
+				newPos = TryNeighbor(requestedPos); 
 		}
 		else
 			newPos = currentPos;	

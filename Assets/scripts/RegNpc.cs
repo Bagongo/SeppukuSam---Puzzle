@@ -3,6 +3,13 @@ using System.Collections;
 
 public class RegNpc : EntityBehavior, IMovable {
 
+	public GameObject mutant;
+
+	void Start()
+	{
+
+	}
+
 	public int[] EvaluateMovement()
 	{
 		int[] requestedPos = new int[]{currentPos[0]+moveDirection[0], currentPos[1]+moveDirection[1]};
@@ -13,7 +20,7 @@ public class RegNpc : EntityBehavior, IMovable {
 			if(boardMan.entities[requestedPos[0], requestedPos[1]] == null)
 				newPos = requestedPos;
 			else
-				newPos = TryNeighbor(requestedPos, Random.value <= .5 ? 1 : -1); 
+				newPos = TryNeighbor(requestedPos); 
 		}
 		else
 			newPos = currentPos;	
