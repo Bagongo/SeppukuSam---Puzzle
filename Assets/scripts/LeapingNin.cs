@@ -15,7 +15,6 @@ public class LeapingNin : RegEnemy {
 		player = FindObjectOfType<PlayerBehavior>();
 	}
 
-
 	public override void ElaborateMove()
 	{
 		string coroutine;

@@ -3,13 +3,6 @@ using System.Collections;
 
 public class RegNpc : EntityBehavior, IMovable {
 
-	public GameObject mutant;
-
-	void Start()
-	{
-
-	}
-
 	public int[] EvaluateMovement()
 	{
 		int[] requestedPos = new int[]{currentPos[0]+moveDirection[0], currentPos[1]+moveDirection[1]};
@@ -27,4 +20,10 @@ public class RegNpc : EntityBehavior, IMovable {
 
 		return newPos;
 	}
+
+//	public T ReturnThis<T>(T script)
+//	where T : RegNpc
+//	{		
+//		return script;
+//	}
 }
