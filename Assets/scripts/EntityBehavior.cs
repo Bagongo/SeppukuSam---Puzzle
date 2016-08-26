@@ -14,7 +14,7 @@ public class EntityBehavior : MonoBehaviour {
 	public int nmbrOfMoves;
 	public int movesCompleted = 0;
 	public bool isMoving = false;
-	//public bool isMutant = false;
+	public bool isMutant = false;
 	public bool hasKnife;
 	public bool canPickUp;
 	public bool canDrop;
@@ -148,13 +148,18 @@ public class EntityBehavior : MonoBehaviour {
 	{
 		if(this is IMovable)
 		{
-			LookForKnife();
-			nextPos = GetComponent<IMovable>().EvaluateMovement();
-			grid[nextPos[0], nextPos[1]].GetComponent<SpriteRenderer>().color = moveColor;
-			boardMan.UpdateGrid(currentPos, nextPos);				
-			Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
-			isMoving = true;
-			StartCoroutine(SmoothMovement(newPos));
+			if(isMutant && transform.GetChild(0).GetComponent<MutatingNin>().EvaluateMutation())
+				transform.GetChild(0).GetComponent<MutatingNin>().PrepareMutation();				
+			else
+			{
+				LookForKnife();
+				nextPos = GetComponent<IMovable>().EvaluateMovement();
+				grid[nextPos[0], nextPos[1]].GetComponent<SpriteRenderer>().color = moveColor;
+				boardMan.UpdateGrid(currentPos, nextPos);				
+				Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
+				isMoving = true;
+				StartCoroutine(SmoothMovement(newPos));
+			}
 		}
 		else 
 		{

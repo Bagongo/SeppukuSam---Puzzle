@@ -100,13 +100,15 @@ public class BoardMan : MonoBehaviour {
 		}
 	}
 
-	public void InstantiateSingleEntity(GameObject toSpawn, int[] atPos)
+	public GameObject InstantiateSingleEntity(GameObject toSpawn, int[] atPos)
 	{
 		Vector3 spawnPos = grid[atPos[0], atPos[1]].transform.position;
 		GameObject newEntity = Instantiate(toSpawn, spawnPos, Quaternion.identity) as GameObject;
 		EntityBehavior entB = newEntity.GetComponent<EntityBehavior>();
 		entB.currentPos = new int[]{atPos[0], atPos[1]};
 		entities[atPos[0], atPos[1]] = newEntity;
+
+		return newEntity;
 	}
 
 	public void KnifeImpact()

@@ -1,29 +1,75 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MutatingNin : RegEnemy {
+public class MutatingNin : EntityBehavior {
+
+	public GameObject[] disguises;
+
+	private GameObject disguise;
+	private GameObject npc;
+	private RegNpc npcB;
+	private GameObject realID;
+	private RegEnemy eneB;
+	private SpriteRenderer sprtRen;
+	private float opacityIncrementFact;
 
 	void Start () {
 
-		StartCoroutine(Appear());
+		disguise = disguises[Random.Range(0, disguises.Length)];
+		npc = boardMan.InstantiateSingleEntity(disguise, currentPos);
+		transform.parent = npc.transform;
+
+		npcB = npc.GetComponent<RegNpc>();
+		npcB.isMutant = true;
+
+		realID = transform.GetChild(0).gameObject;
+		eneB = realID.GetComponent<RegEnemy>();
+		sprtRen = eneB.GetComponent<SpriteRenderer>();
+		opacityIncrementFact = eneB.speed;
+	}
+
+	public bool EvaluateMutation()
+ 	{
+		if(npcB.currentPos[1] < npcB.gridH - 3 && npcB.currentPos[1] > 4) //&& Random.value < 0.4f)
+ 			return true;
+ 		else
+ 			return false; 
+ 	}
+
+	public void PrepareMutation()
+	{
+		turnMan.totalMovesToClear += eneB.nmbrOfMoves;
+		npcB.EraseRemainingMoves();
+		//npcB.CompensateMoves(1);
+		//eneB.movesCompleted = eneB.nmbrOfMoves - 1;
+		eneB.nextPos = npcB.currentPos;
+
+		transform.parent = null;
+		realID.transform.parent = null;
+		transform.parent = realID.transform;
+	
+		npcB.EliminateEntity();
+
+		boardMan.entities[eneB.nextPos[0], eneB.nextPos[1]] = eneB.gameObject;
+			
+		StartCoroutine("Appear");
 	}
 
 	IEnumerator Appear()
 	{
-		Debug.Log(name + "-> appearing...");
+		Color newColor = sprtRen.color;
+		float tempOpacity = newColor.a;
 
-		Color color = GetComponent<SpriteRenderer>().color;
-		float tempOpacity = color.a;
-
-		while(tempOpacity < 1)
+		while(tempOpacity < 1f)
 		{
-			tempOpacity += speed * Time.deltaTime;
-			color = new Color(color.r, color.g, color.b, tempOpacity);
-			GetComponent<SpriteRenderer>().color = color;
+			tempOpacity += opacityIncrementFact * Time.deltaTime;
+			newColor = new Color(newColor.r, newColor.g, newColor.b, tempOpacity);
+			sprtRen.color = newColor;
 
 			yield return null;
 		}
-	}
 
+		eneB.FinalizeMovement();
+	}
 
 }

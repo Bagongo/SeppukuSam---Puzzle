@@ -3,8 +3,6 @@ using System.Collections;
 
 public class RegNpc : EntityBehavior, IMovable {
 
-	public GameObject mutant;
-
 	void Start()
 	{
 
