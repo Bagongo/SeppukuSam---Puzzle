@@ -9,6 +9,7 @@ public enum Row {empty, npc, enemy};
 public class TurnMan : MonoBehaviour {
 
 	public int turnNmr;
+	public int turnThreshold;
 	public int turnsAtSetup = 5;
 	public bool holdStep = false;
 	public int totalMovesToClear = 0;
@@ -19,6 +20,7 @@ public class TurnMan : MonoBehaviour {
 	private BoardMan boardMan;
 	private ScoreMan scoreMan;
 	private PlayerBehavior player;
+	private LevelMan levelMan;
 
 	void Awake()
 	{
@@ -27,6 +29,7 @@ public class TurnMan : MonoBehaviour {
 		gridH = boardMan.gridH;
 
 		scoreMan = (ScoreMan)FindObjectOfType(typeof(ScoreMan));
+		levelMan = (LevelMan)FindObjectOfType(typeof(LevelMan));
 	}
 
 	void Start () {
@@ -34,6 +37,7 @@ public class TurnMan : MonoBehaviour {
 		player = FindObjectOfType<PlayerBehavior>();					
 
 		turnNmr = 7;
+		turnThreshold = 50;
 	}
 
 	Row WhatTypeOfRow(int turnNmr)
@@ -122,6 +126,12 @@ public class TurnMan : MonoBehaviour {
 
 	public void NextTurn()
 	{
+		if(turnNmr >= turnThreshold)
+		{
+			turnThreshold += 50;
+			levelMan.NextLevel();
+		} 
+
 		turnNmr++;
 		boardMan.SpawnRow(WhatTypeOfRow(turnNmr), gridH-1);
 		player.playerBlocked = false;	

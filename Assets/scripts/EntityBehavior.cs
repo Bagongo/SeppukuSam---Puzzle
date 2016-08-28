@@ -51,15 +51,9 @@ public class EntityBehavior : MonoBehaviour {
 		SortNextMove();
 	}
 
-	public void SortNextMove()
+	public virtual void SortNextMove()
 	{
-		if(GetComponent<PlayerBehavior>())
-		{
-			boardMan.playerPos = currentPos;
-			movesCompleted++;
-			turnMan.NpcsAndEnemiesMove();
-		}
-		else if(currentPos[1] == 1 && movesCompleted < nmbrOfMoves)
+		if(currentPos[1] == 1 && movesCompleted < nmbrOfMoves)
 		{
 			EraseRemainingMoves();
 

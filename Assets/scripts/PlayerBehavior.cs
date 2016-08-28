@@ -114,6 +114,13 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 		StartCoroutine(SmoothMovement(newPos));
 	}
 
+	public override void SortNextMove()
+	{
+		boardMan.playerPos = currentPos;
+		movesCompleted++;
+		turnMan.NpcsAndEnemiesMove();	
+	}
+
 	public void Attack(int[] targetPos)
 	{
 		//Debug.Log("player Attacking....");

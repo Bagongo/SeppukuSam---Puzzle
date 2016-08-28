@@ -14,7 +14,7 @@ public class CustomAssetUtil {
 		T asset = null;
 		asset = ScriptableObject.CreateInstance<T>();
 
-		var newPAth = AssetDatabase.GenerateUniqueAssetPath(path);
+		var newPath = AssetDatabase.GenerateUniqueAssetPath(path);
 		AssetDatabase.CreateAsset(asset, path);
 
 		AssetDatabase.SaveAssets();
