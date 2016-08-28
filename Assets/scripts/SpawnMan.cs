@@ -10,18 +10,29 @@ public class SpawnMan : MonoBehaviour {
 	public BoardMan boardMan;
 	public TurnMan turnMan;
 	public LevelMan levelMan;
+	public List<GameObject> npcsPool;
+	public List<GameObject> enemiesPool;
 
-	private List<GameObject> npcsPool;
-	private List<GameObject> enemiesPool;
 	private int npcPoolIdx = 0;
 	private int enemiesPoolIdx = 0;
 
 	void Start () {
 
-		npcsPool.Add(null);
+		PopulatePools(2);
 
-		CreateNpcRow();
-	
+		CreateNpcRow();	
+	}
+
+	void PopulatePools(int upToIdx)
+	{
+		for(int i=0; i<=upToIdx; i++)
+		{
+			npcsPool.Add(npcsToAdd[i]);
+			npcPoolIdx++;
+
+			enemiesPool.Add(enemiesToAdd[i]);
+			enemiesPoolIdx++;
+ 		}
 	}
 
 	public void EvaluatePoolAdding(int difficulty)
@@ -67,25 +78,21 @@ public class SpawnMan : MonoBehaviour {
 
 		for(int i=0; i < boardMan.gridW; i++)
 		{
-			idx = (int) Choose(CreateProbsInverse(npcsPool.Count));
+			idx = (int)Choose(CreateProbsInverse(npcsPool.Count));
 			row.Add(npcsPool[idx]);	
 		}
-
-		Debug.Log(row);
-
+	
 		return row;
 	}
 
 	float[] CreateProbsInverse(int dim)
 	{
 		float[] probs = new float[dim];
-		int agumentProb;
 
-		for(int i = probs.Length; i>0; i--)
+		for(int i=0; i < probs.Length; i++)
 		{
-			agumentProb = levelMan.diff;
-			probs[i] = 100/i + agumentProb;
-			agumentProb -= i*10;
+			probs[i] = (100 / (i+1)) + (levelMan.diff * (i+1));
+			Debug.Log(levelMan.diff + " " + probs[1]);
 		}
 
 		return probs;
