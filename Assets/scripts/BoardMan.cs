@@ -40,27 +40,8 @@ public class BoardMan : MonoBehaviour {
 
 	void Start(){
 
-		PopulateBoard();
-	}
-
-	void PopulateBoard()
-	{
 		player = Instantiate(playerPrefab, grid[playerPos[0], playerPos[1]].transform.position, Quaternion.identity) as GameObject;
-
-		//reactivate in case player row consider player as unity (null and recreate on each move)........
-		//entities[playerPos[0], playerPos[1]] = player;
-
 		player.GetComponent<PlayerBehavior>().currentPos = playerPos;
-
-		for(int y=1; y<gridH; y++)
-		{
-			if(y==4 || y==6)
-				SpawnRow(Row.npc, y);
-			else if(y== gridH-1)
-				SpawnRow(Row.enemy, y);
-			else 
-				SpawnRow(Row.empty, y);
-		}
 	}
 
 	public void SpawnRow(Row whatTospawn, int y) //consider delegating type of spawnable choice to other method or brand new spawner in game element...

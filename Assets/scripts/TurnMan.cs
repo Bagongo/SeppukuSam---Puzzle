@@ -21,6 +21,7 @@ public class TurnMan : MonoBehaviour {
 	private ScoreMan scoreMan;
 	private PlayerBehavior player;
 	private LevelMan levelMan;
+	private SpawnMan spawMan;
 
 	void Awake()
 	{
@@ -30,6 +31,7 @@ public class TurnMan : MonoBehaviour {
 
 		scoreMan = (ScoreMan)FindObjectOfType(typeof(ScoreMan));
 		levelMan = (LevelMan)FindObjectOfType(typeof(LevelMan));
+		spawMan = (SpawnMan)FindObjectOfType(typeof(SpawnMan));
 	}
 
 	void Start () {
@@ -38,16 +40,6 @@ public class TurnMan : MonoBehaviour {
 
 		turnNmr = 7;
 		turnThreshold = 50;
-	}
-
-	Row WhatTypeOfRow(int turnNmr)
-	{
-		if(turnNmr%7 == 0)
-			return Row.enemy;
-		else if(turnNmr%4 == 0 || turnNmr%5 == 0 || turnNmr%6 ==0)
-			return Row.npc;
-		else 
-			return Row.empty;
 	}
 
 	public void AllEntitiesMoved()
@@ -133,8 +125,16 @@ public class TurnMan : MonoBehaviour {
 		} 
 
 		turnNmr++;
-		boardMan.SpawnRow(WhatTypeOfRow(turnNmr), gridH-1);
+		SpawnRowAt(gridH-1);
 		player.playerBlocked = false;	
+	}
+
+	public void SpawnRowAt(int pos)
+	{
+		if(turnNmr%7 == 0)
+			spawMan.SpawnEnemyRow(pos);
+		else if(turnNmr%4 == 0 || turnNmr%5 == 0 || turnNmr%6 ==0)
+			spawMan.SpawnNpcsRow(pos);
 	}
 
 	public void GameOver()
