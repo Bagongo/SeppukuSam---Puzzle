@@ -5,9 +5,12 @@ public class RoamerNpc : EntityBehavior, IMovable {
 
 	public bool switchedDir = false;
 
+	private SpriteRenderer sprtRend;
+
 	void Start(){
 
 		moveDirection[0] = Random.value < 0.5f ? -1 : 1;
+		FlipSprite();
 	}
 	
 	public int[] EvaluateMovement()
@@ -25,6 +28,7 @@ public class RoamerNpc : EntityBehavior, IMovable {
 			if(!switchedDir)
 			{		
 				moveDirection[0] = -moveDirection[0];
+				FlipSprite();
 				switchedDir = true;
 				return EvaluateMovement();
 			}
@@ -36,5 +40,11 @@ public class RoamerNpc : EntityBehavior, IMovable {
 
 		switchedDir = false;
 		return newPos;
+	}
+
+	private void FlipSprite()
+	{
+		float facingDirX = moveDirection[0]/ Mathf.Abs(moveDirection[0]);
+		transform.localScale = new Vector2(facingDirX, transform.localScale.y);
 	}	
 }
