@@ -111,38 +111,6 @@ public class BoardMan : MonoBehaviour {
 		return newEntity;
 	}
 
-	public void KnifeImpact()
-	{
-		int x = playerPos[0];
-
-		for(int i=1; i<gridH; i++)
-		{
-			int[] pos = new int[]{x,i};
-
-			if(entities[x,i] != null)
-			{
-				EntityBehavior entB = entities[x,i].GetComponent<EntityBehavior>();
-				entB.EliminateEntity();
-				DropKnife(pos);	
-				break;
-			}
-			else if(i == gridH-1 && entities[x,i] == null)
-				DropKnife(pos);	
-		}	
-	}
-
-	public void PickUpKnife(int[] pos)
-	{
-		Destroy(items[pos[0], pos[1]]);
-		items[pos[0], pos[1]] = null;
-	}
-
-	public void DropKnife(int[] pos)
-	{
-		knife = Instantiate(knifePrefab, grid[pos[0],pos[1]].transform.position, Quaternion.identity) as GameObject; //instantiate at launch when implementing anims......
-		items[pos[0],pos[1]] = knife;	
-	}
-
 	public void UpdateGrid(int[]formerPos, int[]newPos)
 	{
 		GameObject ent = entities[formerPos[0], formerPos[1]];

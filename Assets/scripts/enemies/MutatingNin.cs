@@ -16,9 +16,12 @@ public class MutatingNin : EntityBehavior {
 	void Start () {
 
 		disguise = disguises[Random.Range(0, disguises.Length)];
+//		npcB = disguise.GetComponent<RegNpc>();
+//		npcB.canPickUp = false;
+//		npcB.canDrop = false;
+
 		npc = boardMan.InstantiateSingleEntity(disguise, currentPos);
 		transform.parent = npc.transform;
-
 		npcB = npc.GetComponent<RegNpc>();
 		npcB.isMutant = true;
 

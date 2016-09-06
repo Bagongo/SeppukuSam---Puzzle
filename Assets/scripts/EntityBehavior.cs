@@ -21,12 +21,15 @@ public class EntityBehavior : MonoBehaviour {
 	public BoardMan boardMan;
 	public GameObject[,] grid;
 	public GameObject[,] items;
+	public GameObject knifePrefab;
 	public TurnMan turnMan;
 	public ScoreMan scoreMan;
 	public int gridW;
 	public int gridH;
 	public Castle castle;
 	public float speed;
+
+	protected GameObject knife;
 
 	protected virtual void Awake()
 	{
@@ -41,7 +44,7 @@ public class EntityBehavior : MonoBehaviour {
 		castle = (Castle)FindObjectOfType(typeof(Castle));	
 	}
 
-	public void FinalizeMovement()
+	public virtual void FinalizeMovement()
 	{
 		isMoving = false;
 		currentPos = nextPos;
@@ -51,15 +54,9 @@ public class EntityBehavior : MonoBehaviour {
 		SortNextMove();
 	}
 
-	public void SortNextMove()
+	public virtual void SortNextMove()
 	{
-		if(GetComponent<PlayerBehavior>())
-		{
-			boardMan.playerPos = currentPos;
-			movesCompleted++;
-			turnMan.NpcsAndEnemiesMove();
-		}
-		else if(currentPos[1] == 1 && movesCompleted < nmbrOfMoves)
+		if(currentPos[1] == 1 && movesCompleted < nmbrOfMoves)
 		{
 			EraseRemainingMoves();
 
@@ -112,15 +109,6 @@ public class EntityBehavior : MonoBehaviour {
         FinalizeMovement();
     }
 
-	public void LookForKnife()
-	{
-		if(canPickUp && !hasKnife && items[currentPos[0], currentPos[1]] != null)
-		{
-			hasKnife = true;
-			boardMan.PickUpKnife(currentPos);
-		}
-	}
-
 	public bool IsInBoundsX(int[] requestedPos)
 	{
 		if(requestedPos[0] >= 0 && requestedPos[0] < gridW)
@@ -167,12 +155,24 @@ public class EntityBehavior : MonoBehaviour {
 		}
 	}
 
+	public void LookForKnife()
+	{
+		if(canPickUp && !hasKnife && items[currentPos[0], currentPos[1]] != null)
+		{
+			Destroy(items[currentPos[0], currentPos[1]]);
+			items[currentPos[0], currentPos[1]] = null;
+			hasKnife = true;
+		}
+	}
+
+	public void DropKnife(int[] pos)
+	{
+		knife = Instantiate(knifePrefab, grid[pos[0], pos[1]].transform.position, Quaternion.identity) as GameObject; 
+		items[ pos[0], pos[1]] = knife;	
+	}
+
 	public void GoToCastle()
 	{
-		//reactivate in case player row considers player as board unity (null and recreate on each move)........				
-//		moveDirection = new int[]{0, -1}; 
-//		ElaborateMove();
-
 		nextPos = new int[]{currentPos[0], currentPos[1] - 1};
 		boardMan.UpdateGrid(currentPos, nextPos);
 		Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
@@ -192,7 +192,7 @@ public class EntityBehavior : MonoBehaviour {
 			posToEliminateAt = currentPos;
 
 		if(hasKnife && canDrop)
-			boardMan.DropKnife(posToEliminateAt);
+			DropKnife(currentPos);
 
 		Destroy(this.gameObject);	
 		boardMan.RemoveFromGrid(posToEliminateAt);

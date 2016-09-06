@@ -7,6 +7,7 @@ public class RegEnemy : EntityBehavior, IMovable, IAttacker{
 
 	public int[] EvaluateMovement()
 	{
+
 		int[] requestedPos = new int[]{currentPos[0]+moveDirection[0], currentPos[1]+moveDirection[1]};
 		int[] newPos;
 									
@@ -60,6 +61,12 @@ public class RegEnemy : EntityBehavior, IMovable, IAttacker{
 	public void Attack(int[] targetPos)
 	{
 		EntityBehavior entB = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
+		KillEntity(entB, false);
+	}
+
+	public void KillEntity(EntityBehavior entB, bool killedByPlayer )
+	{
+		scoreMan.HonorAndScoreUpdater(entB, killedByPlayer);
 		entB.EliminateEntity();
 	}		
 }

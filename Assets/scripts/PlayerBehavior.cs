@@ -78,10 +78,9 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 				moveDirection = new int[]{0,0};
 				break;
 			case PlayerMoves.knife:
-				hasKnife = false;				
-				boardMan.KnifeImpact();
+				StartCoroutine(KnifeImpact());
 				moveDirection = new int[]{0,0};
-				break;
+				return;
 			case PlayerMoves.left:
 				moveDirection = new int[]{-1,0,};
 				break;
@@ -114,6 +113,13 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 		StartCoroutine(SmoothMovement(newPos));
 	}
 
+	public override void SortNextMove()
+	{
+		boardMan.playerPos = currentPos;
+		movesCompleted++;
+		turnMan.NpcsAndEnemiesMove();
+	}
+
 	public void Attack(int[] targetPos)
 	{
 		//Debug.Log("player Attacking....");
@@ -121,8 +127,7 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 		if(boardMan.entities[targetPos[0], targetPos[1]] != null)
 		{
 			EntityBehavior target = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
-			scoreMan.HonorAndScoreUpdater(target, true);
-			target.EliminateEntity();
+			KillEntity(target, true);
 		}
 
 		if(turnMan.ContinueGame())			
@@ -133,5 +138,35 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 			turnMan.ResolveFirstRow();
 		}
 	}
+
+	public void KillEntity(EntityBehavior entB, bool killedByPlayer )
+	{
+		scoreMan.HonorAndScoreUpdater(entB, killedByPlayer);
+		entB.EliminateEntity();
+	}
+
+	public IEnumerator KnifeImpact()
+	{
+		int x = currentPos[0];
+		int[] pos = {x,0};
+
+		for(int i=1; i<gridH; i++)
+		{
+			pos[1] = i;
+
+			if(boardMan.entities[x,i] != null)
+				break;
+		}
+
+		knife = Instantiate(knifePrefab, grid[currentPos[0], currentPos[1]].transform.position, Quaternion.identity) as GameObject; 
+		Knife knifeB = knife.GetComponent<Knife>();
+		knifeB.LaunchKnife(pos);
+
+		while(!knifeB.hasHit)
+			yield return new WaitForSeconds(0.1f);
+
+		ElaborateMove();
+	}	
+
 
 }
