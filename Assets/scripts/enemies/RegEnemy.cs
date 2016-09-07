@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class RegEnemy : EntityBehavior, IMovable, IAttacker{
 
@@ -7,7 +8,6 @@ public class RegEnemy : EntityBehavior, IMovable, IAttacker{
 
 	public int[] EvaluateMovement()
 	{
-
 		int[] requestedPos = new int[]{currentPos[0]+moveDirection[0], currentPos[1]+moveDirection[1]};
 		int[] newPos;
 									
@@ -17,8 +17,12 @@ public class RegEnemy : EntityBehavior, IMovable, IAttacker{
 				newPos = requestedPos;
 			else
 			{
-				if(TryNeighbor(requestedPos) == currentPos) //enemy is stuck
-				{
+				int[] tempPos = TryNeighbor(requestedPos);
+
+				if (!currentPos.SequenceEqual(tempPos))
+					newPos = tempPos;
+				else    //enemy is stuck
+				{				
 					target = WhereToAttack();
 
 					if(target != null)
@@ -28,10 +32,8 @@ public class RegEnemy : EntityBehavior, IMovable, IAttacker{
 						target = null;	
 					}
 					else
-						newPos = currentPos;			
+						newPos = tempPos;
 				}
-				else
-					newPos = TryNeighbor(requestedPos); 	
 			} 
 		}
 		else 
@@ -55,18 +57,20 @@ public class RegEnemy : EntityBehavior, IMovable, IAttacker{
 		else 
 			attackHere = null;
 
+		Debug.Log(attackHere[0]);
+
 		return attackHere;		
 	}
 
 	public void Attack(int[] targetPos)
 	{
 		EntityBehavior entB = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
-		KillEntity(entB, false);
+		KillEntity(entB);
 	}
 
-	public void KillEntity(EntityBehavior entB, bool killedByPlayer )
+	public void KillEntity(EntityBehavior entB)
 	{
-		scoreMan.HonorAndScoreUpdater(entB, killedByPlayer);
+		scoreMan.HonorAndScoreUpdater(entB, false);
 		entB.EliminateEntity();
 	}		
 }

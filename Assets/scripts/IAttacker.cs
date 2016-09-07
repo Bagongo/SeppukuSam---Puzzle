@@ -4,6 +4,6 @@ using System.Collections;
 public interface IAttacker{
 
 	 void Attack(int[] targetPos);
-	 void KillEntity(EntityBehavior entB, bool killedByPlayer );
+	 void KillEntity(EntityBehavior entB);
 
 }

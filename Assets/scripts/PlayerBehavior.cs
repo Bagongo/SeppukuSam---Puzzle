@@ -127,7 +127,7 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 		if(boardMan.entities[targetPos[0], targetPos[1]] != null)
 		{
 			EntityBehavior target = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
-			KillEntity(target, true);
+			KillEntity(target);
 		}
 
 		if(turnMan.ContinueGame())			
@@ -136,12 +136,11 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 		{
 			//turnMan.GameOver();
 			turnMan.ResolveFirstRow();
-		}
-	}
+		}}
 
-	public void KillEntity(EntityBehavior entB, bool killedByPlayer )
+	public void KillEntity(EntityBehavior entB)
 	{
-		scoreMan.HonorAndScoreUpdater(entB, killedByPlayer);
+		scoreMan.HonorAndScoreUpdater(entB, true);
 		entB.EliminateEntity();
 	}
 
@@ -165,7 +164,14 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 		while(!knifeB.hasHit)
 			yield return new WaitForSeconds(0.1f);
 
-		ElaborateMove();
+		if(turnMan.ContinueGame())			
+			ElaborateMove();
+		else
+		{
+			//turnMan.GameOver();
+			ElaborateMove();
+		}
+
 	}	
 
 

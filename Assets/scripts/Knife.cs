@@ -6,6 +6,12 @@ public class Knife : EntityBehavior {
 	public bool hasHit = false;
 
 	private int[] targetPos;
+	private PlayerBehavior player;
+
+	void Start()
+	{
+		player = (PlayerBehavior)FindObjectOfType(typeof(PlayerBehavior));
+	}
 
 	public void LaunchKnife(int[] target)
 	{
@@ -25,7 +31,7 @@ public class Knife : EntityBehavior {
 
 			//entB.LookForKnife(); figure out if needed to be picked up first and dropped at elimination........
 
-			entB.EliminateEntity();
+			player.KillEntity(entB);
 		}
 
 		hasHit = true;

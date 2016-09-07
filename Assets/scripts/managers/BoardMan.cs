@@ -46,10 +46,6 @@ public class BoardMan : MonoBehaviour {
 	void PopulateBoard()
 	{
 		player = Instantiate(playerPrefab, grid[playerPos[0], playerPos[1]].transform.position, Quaternion.identity) as GameObject;
-
-		//reactivate in case player row consider player as unity (null and recreate on each move)........
-		//entities[playerPos[0], playerPos[1]] = player;
-
 		player.GetComponent<PlayerBehavior>().currentPos = playerPos;
 
 		for(int y=1; y<gridH; y++)
