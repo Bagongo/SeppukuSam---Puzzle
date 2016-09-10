@@ -13,19 +13,16 @@ public class OldNpc : RegNpc {
 
 	public override void ElaborateMove()
 	{
-//		if(movesEveryOtherTurn && hasMovedPrevTurn)
-//		{
-//			hasMovedPrevTurn = false;
-//			EraseRemainingMoves();
-//		}
-//		else
-//		{
-//			hasMovedPrevTurn = true;
-//			base.ElaborateMove();	
-//		}
-
-		base.ElaborateMove();	
-												
+		if(movesEveryOtherTurn && hasMovedPrevTurn)
+		{
+			hasMovedPrevTurn = false;
+			EraseRemainingMoves();
+		}
+		else
+		{
+			hasMovedPrevTurn = true;
+			base.ElaborateMove();	
+		}												
 	}
 
 
