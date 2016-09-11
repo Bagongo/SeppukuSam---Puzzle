@@ -15,20 +15,34 @@ public class MutatingNin : EntityBehavior {
 
 	void Start () {
 
-		disguise = disguises[Random.Range(0, disguises.Length)];
-//		npcB = disguise.GetComponent<RegNpc>();
-//		npcB.canPickUp = false;
-//		npcB.canDrop = false;
+		CreateDisguise();
+		InitializeRealID();
+		InitializaDisguise();
+	}
 
+	void CreateDisguise()
+	{
+		disguise = disguises[Random.Range(0, disguises.Length)];
 		npc = boardMan.InstantiateSingleEntity(disguise, currentPos);
 		transform.parent = npc.transform;
-		npcB = npc.GetComponent<RegNpc>();
-		npcB.isMutant = true;
+	}
 
+	void InitializeRealID()
+	{
 		realID = transform.GetChild(0).gameObject;
 		eneB = realID.GetComponent<RegEnemy>();
 		sprtRen = eneB.GetComponent<SpriteRenderer>();
 		opacityIncrementFact = eneB.speed;
+	}
+
+	void InitializaDisguise()
+	{
+		npcB = npc.GetComponent<RegNpc>();
+		npcB.isMutant = true;
+		npcB.canPickUp = false;
+		npcB.canDrop = false;
+		npcB.honorValue = eneB.honorValue;
+		npcB.scoreValue = eneB.scoreValue;
 	}
 
 	public bool EvaluateMutation()
