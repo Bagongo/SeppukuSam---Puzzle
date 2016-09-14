@@ -19,10 +19,6 @@ public class Castle : MonoBehaviour {
 			entB.EliminateEntity();
 			turnMan.movesCleared++;
 
-			if(turnMan.ContinueTurn())
-			{
-				turnMan.NextTurn();
-			}
 //		}
 //		else
 //			turnMan.GameOver();

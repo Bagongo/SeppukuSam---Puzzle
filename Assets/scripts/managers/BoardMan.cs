@@ -17,8 +17,6 @@ public class BoardMan : MonoBehaviour {
 	public GameObject[,] items;
 	public GameObject player; 
 
-	private GameObject knife;
-
 	void Awake(){
 
 		grid = new GameObject[gridW, gridH];

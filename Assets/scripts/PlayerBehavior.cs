@@ -136,7 +136,8 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 		{
 			//turnMan.GameOver();
 			turnMan.ResolveFirstRow();
-		}}
+		}
+	}
 
 	public void KillEntity(EntityBehavior entB)
 	{
@@ -157,7 +158,7 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 				break;
 		}
 
-		knife = Instantiate(knifePrefab, grid[currentPos[0], currentPos[1]].transform.position, Quaternion.identity) as GameObject; 
+		knife = Instantiate(boardMan.knifePrefab, grid[currentPos[0], currentPos[1]].transform.position, Quaternion.identity) as GameObject; 
 		Knife knifeB = knife.GetComponent<Knife>();
 		knifeB.LaunchKnife(pos);
 

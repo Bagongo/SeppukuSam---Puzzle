@@ -57,8 +57,6 @@ public class RegEnemy : EntityBehavior, IMovable, IAttacker{
 		else 
 			attackHere = null;
 
-		Debug.Log(attackHere[0] + " " + attackHere[1]);
-
 		return attackHere;		
 	}
 

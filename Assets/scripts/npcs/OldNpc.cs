@@ -7,25 +7,22 @@ public class OldNpc : RegNpc {
 
 	private bool hasMovedPrevTurn = false;
 
+
 	public override void ElaborateMove()
 	{
+		if(currentPos[1] < 2);
+			movesEveryOtherTurn = false;
+									
 		if(movesEveryOtherTurn && hasMovedPrevTurn)
 		{
-			StartCoroutine(WaitToResolve(0.25f));
 			hasMovedPrevTurn = false;
+			SortNextMove();
 		}
 		else
 		{
 			hasMovedPrevTurn = true;
-			base.ElaborateMove();	
-		}														
+			base.ElaborateMove();
+		}
+
 	}
-
-	IEnumerator WaitToResolve(float time)
-	{
-		 yield return new WaitForSeconds(time);
-		 SortNextMove();
-	}
-
-
 }

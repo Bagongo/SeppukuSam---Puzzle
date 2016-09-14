@@ -10,7 +10,7 @@ public class RegNpc : EntityBehavior, IMovable {
 									
 		if(IsInBoundsX(requestedPos))
 		{
-			if(boardMan.entities[requestedPos[0], requestedPos[1]] == null)
+			if(boardMan.entities[requestedPos[0], requestedPos[1]] == null || boardMan.entities[requestedPos[0], requestedPos[1]] == this.gameObject)
 				newPos = requestedPos;
 			else
 				newPos = TryNeighbor(requestedPos); 

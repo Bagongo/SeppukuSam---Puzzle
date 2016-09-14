@@ -67,7 +67,9 @@ public class TurnMan : MonoBehaviour {
 		}
 
 		if(entitiesFound < 1)
-			NextTurn();									
+			NextTurn();		
+		else
+			StartCoroutine("CheckIfEntitiesFinishedMoving");							
 	}
 
 	public void NpcsAndEnemiesMove()
@@ -97,19 +99,21 @@ public class TurnMan : MonoBehaviour {
 		}
 
 		if(entitiesFound < 1)
-			AllEntitiesMoved();		
+			AllEntitiesMoved();
+		else
+			StartCoroutine("CheckIfEntitiesFinishedMoving");		
 	}
 
-	public bool ContinueTurn()
+	IEnumerator CheckIfEntitiesFinishedMoving()
 	{
-		if(movesCleared >= totalMovesToClear)
-		{
-			movesCleared = 0;
-			totalMovesToClear = 0;
-			return true;
-		}
-		else
-			return false;
+		while(movesCleared < totalMovesToClear)
+			yield return new WaitForSeconds(0.01f);
+
+		StopCoroutine("CheckIfEntitiesFinishedMoving");
+
+		movesCleared = 0;
+		totalMovesToClear = 0;
+		AllEntitiesMoved();
 	}
 
 	public bool ContinueGame()

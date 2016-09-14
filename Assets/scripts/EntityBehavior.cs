@@ -21,7 +21,6 @@ public class EntityBehavior : MonoBehaviour {
 	public BoardMan boardMan;
 	public GameObject[,] grid;
 	public GameObject[,] items;
-	public GameObject knifePrefab;
 	public TurnMan turnMan;
 	public ScoreMan scoreMan;
 	public int gridW;
@@ -57,16 +56,11 @@ public class EntityBehavior : MonoBehaviour {
 	public virtual void SortNextMove()
 	{
 		if(currentPos[1] == 1 && movesCompleted < nmbrOfMoves)
-		{
 			EraseRemainingMoves();
 
-			if(turnMan.ContinueTurn())
-				turnMan.AllEntitiesMoved();	
-		}
 		else if(currentPos[1] == 0)
-		{
 			castle.TakeIn(this);
-		}
+
 		else
 		{
 			turnMan.movesCleared++;
@@ -75,10 +69,7 @@ public class EntityBehavior : MonoBehaviour {
 			if(movesCompleted < nmbrOfMoves)
 				ElaborateMove();
 			else 
-				movesCompleted = 0;
-
-			if(turnMan.ContinueTurn())
-				turnMan.AllEntitiesMoved();													
+				movesCompleted = 0;											
 		}
 	}
 
@@ -167,7 +158,7 @@ public class EntityBehavior : MonoBehaviour {
 
 	public void DropKnife(int[] pos)
 	{
-		knife = Instantiate(knifePrefab, grid[pos[0], pos[1]].transform.position, Quaternion.identity) as GameObject; 
+		knife = Instantiate(boardMan.knifePrefab, grid[pos[0], pos[1]].transform.position, Quaternion.identity) as GameObject; 
 		items[ pos[0], pos[1]] = knife;	
 	}
 
