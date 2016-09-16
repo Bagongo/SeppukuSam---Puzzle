@@ -10,7 +10,7 @@ public class OldNpc : RegNpc {
 
 	public override void ElaborateMove()
 	{
-		if(currentPos[1] < 2);
+		if(currentPos[1] < 2)
 			movesEveryOtherTurn = false;
 									
 		if(movesEveryOtherTurn && hasMovedPrevTurn)
