@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class RoamerNpc : EntityBehavior, IMovable {
+public class RoamerNpc : RegNpc, IMovable {
 
 	public bool switchedDir = false;
 
@@ -13,7 +13,7 @@ public class RoamerNpc : EntityBehavior, IMovable {
 		FlipSprite();
 	}
 	
-	public int[] EvaluateMovement()
+	public override int[] EvaluateMovement()
 	{
 		int[] requestedPos = new int[]{currentPos[0]+moveDirection[0], currentPos[1]+moveDirection[1]};
 		int[] newPos;

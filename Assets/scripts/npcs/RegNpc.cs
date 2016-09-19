@@ -3,7 +3,7 @@ using System.Collections;
 
 public class RegNpc : EntityBehavior, IMovable {
 
-	public int[] EvaluateMovement()
+	public virtual int[] EvaluateMovement()
 	{
 		int[] requestedPos = new int[]{currentPos[0]+moveDirection[0], currentPos[1]+moveDirection[1]};
 		int[] newPos;
