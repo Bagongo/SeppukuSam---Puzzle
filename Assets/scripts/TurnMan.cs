@@ -36,10 +36,10 @@ public class TurnMan : MonoBehaviour {
 
 	void Start () {
 
-		player = FindObjectOfType<PlayerBehavior>();					
+		player = FindObjectOfType<PlayerBehavior>();
 
+		turnThreshold = 25;					
 		turnNmr = 7;
-		turnThreshold = 50;
 	}
 
 	public void AllEntitiesMoved()
@@ -116,16 +116,34 @@ public class TurnMan : MonoBehaviour {
 			return false;
 	}
 
+	void NextWave()
+	{
+		turnNmr = 0;
+		levelMan.NextLevel();
+	}
+
+	void CheckWaveClearance()
+	{
+		bool entityFound = false;
+
+		foreach(GameObject ent in boardMan.entities)
+		{
+			if(ent != null && ent.tag != "player")
+				entityFound = true;
+		}
+
+		if(!entityFound)
+			NextWave();				
+	}
+
 	public void NextTurn()
 	{
 		if(turnNmr >= turnThreshold)
-		{
-			turnThreshold += 50;
-			levelMan.NextLevel();
-		} 
+			CheckWaveClearance();
+		else
+			SpawnRowAt(gridH-1);
 
 		turnNmr++;
-		SpawnRowAt(gridH-1);
 		player.playerBlocked = false;	
 	}
 

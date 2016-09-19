@@ -12,6 +12,7 @@ public class SpawnMan : MonoBehaviour {
 	public List<GameObject> npcsPool;
 	public List<GameObject> enemiesPool;
 
+	private TurnMan turnMan;
 	private int gridW;
 	private int gridH;
 
@@ -19,6 +20,7 @@ public class SpawnMan : MonoBehaviour {
 	{
 		gridW = boardMan.gridW;
 		gridH = boardMan.gridH;
+		turnMan = (TurnMan)FindObjectOfType(typeof(TurnMan)); 
 	}
 
 
@@ -63,46 +65,39 @@ public class SpawnMan : MonoBehaviour {
 
 	public void SpawnNpcsRow(int yPos)
 	{
-		GameObject[] row = new GameObject[gridW];
-		int idx;
-		bool hasEmptySpace = false;
+		int npcQuant = (int) Choose(CreateProbs(gridW-1, turnMan.turnNmr)) + 1;
+		List<int> availableSlots = new List<int>();
 
 		for(int i=0; i < gridW; i++)
+			availableSlots.Add(i);
+
+		for(int i=1; i <= npcQuant; i++)
 		{
-			idx = (int)Choose(CreateProbsForPools(npcsPool.Count));
-			row[i] = npcsPool[idx];	
-
-			if(idx == 0)
-				hasEmptySpace = true;
-		}
-
-		if(!hasEmptySpace)
-			row[Random.Range(0, row.Length - 1)] = npcsPool[0];
-
-		for(int i=0; i < row.Length; i++)
-		{
-			if(row[i].name != "EmptySlot")
-				boardMan.InstantiateSingleEntity(row[i], new int[]{i, yPos});
-		}				
+			int idx = (int)Choose(CreateProbs(npcsPool.Count, levelMan.diff));
+			GameObject npc = npcsPool[idx];
+			int xPos = availableSlots[Random.Range(0, availableSlots.Count)]; 
+			availableSlots.Remove(xPos);
+			boardMan.InstantiateSingleEntity(npc, new int[]{i, yPos});	
+		}	
 	}
 
 	public void SpawnEnemyRow(int yPos)
 	{
-		int idx = (int)Choose(CreateProbsForPools(enemiesPool.Count));
+		int idx = (int)Choose(CreateProbs(enemiesPool.Count, levelMan.diff));
 		GameObject enemy = enemiesPool[idx];
 		int xPos = Random.Range(0, gridW - 1);
 
 		boardMan.InstantiateSingleEntity(enemy, new int[]{xPos, yPos});
 	}
 
-	float[] CreateProbsForPools(int dim)
+	float[] CreateProbs(int dim, int increment)
 	{
 		float[] probs = new float[dim];
 
 		for(int i=0; i < probs.Length; i++)
 		{
-			probs[i] = (100 / (i+1)) + (levelMan.diff * (i+1));
-			Debug.Log(levelMan.diff + " " + probs[i]);
+			probs[i] = (100 / (i+1)) + (increment * (i+1));
+			//Debug.Log(levelMan.diff + " " + probs[i]);
 		}
 
 		return probs;
