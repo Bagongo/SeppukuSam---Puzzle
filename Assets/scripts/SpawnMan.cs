@@ -31,9 +31,9 @@ public class SpawnMan : MonoBehaviour {
 		PopulateBoard();
 	}
 
-	void PopulatePool(List<GameObject> pool, GameObject[] toAddFrom, int upToIdx)
-	{
-		for(int i=0; i < upToIdx; i++)
+	void PopulatePool(List<GameObject> pool, GameObject[] toAddFrom, int upTo)
+	{			 
+		for(int i=0; i < upTo; i++)
 			pool.Add(toAddFrom[i]);	
 	}
 
@@ -56,7 +56,7 @@ public class SpawnMan : MonoBehaviour {
 				npcsPool.Add(npcsToAdd[npcsPool.Count]);						 
 		}
 
-		if(difficulty % 8 == 0)
+		if(difficulty % 7 == 0)
 		{
 			if(enemiesPool.Count < enemiesToAdd.Length)
 				enemiesPool.Add(enemiesToAdd[enemiesPool.Count]);						 
@@ -65,7 +65,7 @@ public class SpawnMan : MonoBehaviour {
 
 	public void SpawnNpcsRow(int yPos)
 	{
-		int npcQuant = (int) Choose(CreateProbs(gridW-1, turnMan.turnNmr)) + 1;
+		int npcQuant = (int) Choose(CreateProbs(gridW-1, turnMan.turnNmr, true)) + 1;
 		List<int> availableSlots = new List<int>();
 
 		for(int i=0; i < gridW; i++)
@@ -73,32 +73,39 @@ public class SpawnMan : MonoBehaviour {
 
 		for(int i=1; i <= npcQuant; i++)
 		{
-			int idx = (int)Choose(CreateProbs(npcsPool.Count, levelMan.diff));
+			int idx = (int)Choose(CreateProbs(npcsPool.Count, levelMan.diff, false));
 			GameObject npc = npcsPool[idx];
-			int xPos = availableSlots[Random.Range(0, availableSlots.Count)]; 
+			int xPos = availableSlots[Random.Range(0, availableSlots.Count)];
+
+			if(boardMan.entities[xPos, yPos - 1] == null)
+				boardMan.InstantiateSingleEntity(npc, new int[]{xPos, yPos});	
+
 			availableSlots.Remove(xPos);
-			boardMan.InstantiateSingleEntity(npc, new int[]{i, yPos});	
 		}	
 	}
 
 	public void SpawnEnemyRow(int yPos)
 	{
-		int idx = (int)Choose(CreateProbs(enemiesPool.Count, levelMan.diff));
+		int idx = (int)Choose(CreateProbs(enemiesPool.Count, levelMan.diff, false));
 		GameObject enemy = enemiesPool[idx];
 		int xPos = Random.Range(0, gridW - 1);
 
 		boardMan.InstantiateSingleEntity(enemy, new int[]{xPos, yPos});
 	}
 
-	float[] CreateProbs(int dim, int increment)
+	float[] CreateProbs(int dim, int increment, bool dbg)
 	{
 		float[] probs = new float[dim];
+		string str1 = "";
 
 		for(int i=0; i < probs.Length; i++)
 		{
-			probs[i] = (100 / (i+1)) + (increment * (i+1));
-			//Debug.Log(levelMan.diff + " " + probs[i]);
+			probs[i] = 1000/(i+1) + (increment * (i+1));
+			str1 += " " + probs[i];
 		}
+
+		if(dbg)
+			Debug.Log(str1);
 
 		return probs;
 	}

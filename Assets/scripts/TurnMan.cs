@@ -38,7 +38,6 @@ public class TurnMan : MonoBehaviour {
 
 		player = FindObjectOfType<PlayerBehavior>();
 
-		turnThreshold = 25;					
 		turnNmr = 7;
 	}
 
