@@ -6,8 +6,6 @@ public class BoardMan : MonoBehaviour {
 	public GameObject slot;
 	public int gridW ;
 	public int gridH ;
-	public GameObject[] npcs;
-	public GameObject[] enemies;
 	public GameObject playerPrefab;
 	public GameObject knifePrefab;
 	public ScoreMan scoreMan;
@@ -36,62 +34,9 @@ public class BoardMan : MonoBehaviour {
 		transform.position = new Vector3(transform.position.x - grid.GetLength(0)/2, transform.position.y - grid.GetLength(1)/2, 0);
 	}
 
-	void Start(){
-
-		PopulateBoard();
-	}
-
-	void PopulateBoard()
+	void Start()
 	{
-		player = Instantiate(playerPrefab, grid[playerPos[0], playerPos[1]].transform.position, Quaternion.identity) as GameObject;
-		player.GetComponent<PlayerBehavior>().currentPos = playerPos;
-
-		for(int y=1; y<gridH; y++)
-		{
-			if(y==4 || y==6)
-				SpawnRow(Row.npc, y);
-			else if(y== gridH-1)
-				SpawnRow(Row.enemy, y);
-			else 
-				SpawnRow(Row.empty, y);
-		}
-	}
-
-	public void SpawnRow(Row whatTospawn, int y) //consider delegating type of spawnable choice to other method or brand new spawner in game element...
-	{
-		Row whatToSpawn = whatTospawn;
-		int yPos = Mathf.Clamp(y, 1, gridH-1);
-
-		int quantityTofill = 0;
-		int quantityFilled = 0;
-
-		GameObject[] spawnables = null;
-
-		switch(whatToSpawn)
-		{
-			case Row.empty:
-				return;
-			case Row.npc:
-				spawnables = npcs;
-				quantityTofill = Random.Range(1,4); //max 4????
-				break;
-			case Row.enemy:
-				spawnables = enemies;
-				quantityTofill = 1;
-				break;
-		}
-
-		while(quantityTofill > quantityFilled)
-		{
-			GameObject toSpawn = spawnables[Random.Range(0, spawnables.Length)];
-			int xPos = Random.Range(0, gridW);
-
-			if(entities[xPos, yPos] == null && entities[xPos, yPos-1] == null)
-			{	
-				InstantiateSingleEntity(toSpawn, new int[]{xPos, yPos});
-				quantityFilled++ ;
-			}
-		}
+		InstantiateSingleEntity(playerPrefab, playerPos);
 	}
 
 	public GameObject InstantiateSingleEntity(GameObject toSpawn, int[] atPos)
@@ -117,27 +62,5 @@ public class BoardMan : MonoBehaviour {
 		if(entities[pos[0], pos[1]] != null)
 			entities[pos[0], pos[1]] = null;												
 	}
-
-	float Choose (float[] probs) 
-	{
-        float total = 0;
-
-        foreach (float elem in probs) {
-            total += elem;
-        }
-
-        float randomPoint = Random.value * total;
-
-        for (int i= 0; i < probs.Length; i++) {
-            if (randomPoint < probs[i]) {
-                return i;
-            }
-            else {
-                randomPoint -= probs[i];
-            }
-        }
-        return probs.Length - 1;
-    }
-
 }
 

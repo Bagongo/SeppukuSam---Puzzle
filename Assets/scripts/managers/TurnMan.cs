@@ -4,12 +4,10 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 
-public enum Row {empty, npc, enemy};
-
 public class TurnMan : MonoBehaviour {
 
 	public int turnNmr;
-	public int turnsAtSetup = 5;
+	public int turnThreshold;
 	public bool holdStep = false;
 	public int totalMovesToClear = 0;
 	public int movesCleared = 0;
@@ -19,6 +17,8 @@ public class TurnMan : MonoBehaviour {
 	private BoardMan boardMan;
 	private ScoreMan scoreMan;
 	private PlayerBehavior player;
+	private LevelMan levelMan;
+	private SpawnMan spawnMan;
 
 	void Awake()
 	{
@@ -27,23 +27,14 @@ public class TurnMan : MonoBehaviour {
 		gridH = boardMan.gridH;
 
 		scoreMan = (ScoreMan)FindObjectOfType(typeof(ScoreMan));
+		levelMan = (LevelMan)FindObjectOfType(typeof(LevelMan));
+		spawnMan = (SpawnMan)FindObjectOfType(typeof(SpawnMan));
 	}
 
 	void Start () {
 
+		turnNmr = 1;
 		player = FindObjectOfType<PlayerBehavior>();					
-
-		turnNmr = 7;
-	}
-
-	Row WhatTypeOfRow(int turnNmr)
-	{
-		if(turnNmr%7 == 0)
-			return Row.enemy;
-		else if(turnNmr%4 == 0 || turnNmr%5 == 0 || turnNmr%6 ==0)
-			return Row.npc;
-		else 
-			return Row.empty;
 	}
 
 	public void AllEntitiesMoved()
@@ -124,11 +115,43 @@ public class TurnMan : MonoBehaviour {
 			return false;
 	}
 
+	void NextWave()
+	{
+		turnNmr = 0;
+		levelMan.NextLevel();
+	}
+
+	void CheckWaveClearance()
+	{
+		bool entityFound = false;
+
+		foreach(GameObject ent in boardMan.entities)
+		{
+			if(ent != null && ent.tag != "player")
+				entityFound = true;
+		}
+
+		if(!entityFound)
+			NextWave();				
+	}
+
 	public void NextTurn()
 	{
+		if(turnNmr >= turnThreshold)
+			CheckWaveClearance();
+		else
+			SpawnNewRow();
+
 		turnNmr++;
-		boardMan.SpawnRow(WhatTypeOfRow(turnNmr), gridH-1);
 		player.playerBlocked = false;	
+	}
+
+	public void SpawnNewRow()
+	{
+		if(turnNmr%7 == 0)
+			spawnMan.SpawnEnemyRow(gridH-1);
+		else if(turnNmr%4 == 0 || turnNmr%5 == 0 || turnNmr%6 ==0)
+			spawnMan.SpawnNpcsRow(gridH-1);
 	}
 
 	public void GameOver()
@@ -138,3 +161,4 @@ public class TurnMan : MonoBehaviour {
 
 
 }
+
