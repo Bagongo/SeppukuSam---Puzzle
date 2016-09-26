@@ -4,18 +4,25 @@ using System.Collections;
 public class LevelMan : MonoBehaviour {
 
 	public int currentLvl = 1;
-	public int diff = 1;
-	public SpawnMan spawnerMan;
+	public SpawnMan spawnMan;
 
-	void Start () {
-	
+	public int Diff
+	{
+		get
+		{
+			return currentLvl;
+		}
+	}
+
+	void Awake()
+	{
+		spawnMan = (SpawnMan)FindObjectOfType(typeof(SpawnMan));
 	}
 
 	public void NextLevel()
 	{
 		currentLvl++;
-		diff++;
-		spawnerMan.DifficultyIncreaser(diff);
+		spawnMan.DifficultyIncreaser();
 	}
 		
 

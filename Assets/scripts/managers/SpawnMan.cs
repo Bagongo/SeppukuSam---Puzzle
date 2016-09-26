@@ -7,30 +7,47 @@ public class SpawnMan : MonoBehaviour {
 
 	public GameObject[] npcsToAdd;
 	public GameObject[] enemiesToAdd;
-	public int maxNpcXRow;
-	public BoardMan boardMan;
-	public LevelMan levelMan;
 	public List<GameObject> npcsPool;
 	public List<GameObject> enemiesPool;
+	public int maxNpcXRow;
+	public int npcRowSizeTH;
+	public int npcsPoolTH;
+	public int enemiesPoolTH;
+	public float[] npcsRowDimProbs;
+	public float[] npcsPoolingProbs;
+	public float[] enemiesPoolingProbs;
 
+	private BoardMan boardMan;
+	private LevelMan levelMan;
 	private TurnMan turnMan;
+	private Monitor monitor;
 	private int gridW;
 	private int gridH;
 
 	void Awake()
 	{
+		turnMan = (TurnMan)FindObjectOfType(typeof(TurnMan));
+		levelMan = (LevelMan)FindObjectOfType(typeof(LevelMan)); 
+		monitor = (Monitor)FindObjectOfType(typeof(Monitor));
+		boardMan = (BoardMan)FindObjectOfType(typeof(BoardMan));
+
 		gridW = boardMan.gridW;
 		gridH = boardMan.gridH;
-		turnMan = (TurnMan)FindObjectOfType(typeof(TurnMan)); 
 	}
-
 
 	void Start () {
 
+		InitializePoolsAndValues();
 		PopulatePool(npcsPool, npcsToAdd, 2);
 		PopulatePool(enemiesPool, enemiesToAdd, 1);
 		PopulateBoard();
+	}
 
+
+	public void InitializePoolsAndValues()
+	{
+		npcsPool.Clear();
+		enemiesPool.Clear();
 		maxNpcXRow = gridW / 2;
 	}
 
@@ -51,18 +68,18 @@ public class SpawnMan : MonoBehaviour {
 		}
 	}
 
-	public void DifficultyIncreaser(int difficulty)
+	public void DifficultyIncreaser()
 	{
-		if(difficulty % 2 == 0)
+		if(levelMan.Diff % npcRowSizeTH == 0)
 			maxNpcXRow = Mathf.Clamp(maxNpcXRow + 1, 1, gridW - 1);
 
-		if(difficulty % 3 == 0)
+		if(levelMan.Diff % npcsPoolTH == 0)
 		{
 			if(npcsPool.Count < npcsToAdd.Length)
 				npcsPool.Add(npcsToAdd[npcsPool.Count]);						 
 		}
 
-		if(difficulty % 5 == 0)
+		if(levelMan.Diff % enemiesPoolTH == 0)
 		{
 			if(enemiesPool.Count < enemiesToAdd.Length)
 				enemiesPool.Add(enemiesToAdd[enemiesPool.Count]);						 
@@ -71,8 +88,8 @@ public class SpawnMan : MonoBehaviour {
 
 	public void SpawnNpcsRow(int yPos)
 	{
-		int npcQuant = (int) Choose(CreateProbs(maxNpcXRow, turnMan.turnNmr, true)) + 1;
-		npcQuant = Mathf.Clamp(npcQuant, 1, maxNpcXRow);
+		npcsRowDimProbs = CreateProbs(maxNpcXRow, turnMan.turnNmr);
+		int npcQuant = Mathf.Clamp((int)Choose(npcsRowDimProbs) + 1, 1, maxNpcXRow);
 		List<int> availableSlots = new List<int>();
 
 		for(int i=0; i < gridW; i++)
@@ -80,7 +97,8 @@ public class SpawnMan : MonoBehaviour {
 
 		for(int i=1; i <= npcQuant; i++)
 		{
-			int idx = (int)Choose(CreateProbs(npcsPool.Count, levelMan.diff, false));
+			npcsPoolingProbs = CreateProbs(npcsPool.Count, levelMan.Diff);
+			int idx = (int)Choose(npcsPoolingProbs);
 			GameObject npc = npcsPool[idx];
 			int xPos = availableSlots[Random.Range(0, availableSlots.Count)];
 
@@ -93,26 +111,20 @@ public class SpawnMan : MonoBehaviour {
 
 	public void SpawnEnemyRow(int yPos)
 	{
-		int idx = (int)Choose(CreateProbs(enemiesPool.Count, levelMan.diff, false));
+		enemiesPoolingProbs = CreateProbs(enemiesPool.Count, levelMan.Diff);
+		int idx = (int)Choose(enemiesPoolingProbs);
 		GameObject enemy = enemiesPool[idx];
 		int xPos = Random.Range(0, gridW - 1);
 
 		boardMan.InstantiateSingleEntity(enemy, new int[]{xPos, yPos});
 	}
 
-	float[] CreateProbs(int dim, int increment, bool dbg)
+	float[] CreateProbs(int dim, int increment)
 	{
 		float[] probs = new float[dim];
-		string str1 = "";
 
 		for(int i=0; i < probs.Length; i++)
-		{
 			probs[i] = 1000/(i+1) + (increment * i);
-			str1 += " " + probs[i];
-		}
-
-		if(dbg)
-			Debug.Log(str1);
 
 		return probs;
 	}

@@ -8,7 +8,6 @@ public class TurnMan : MonoBehaviour {
 
 	public int turnNmr;
 	public int turnThreshold;
-	public bool holdStep = false;
 	public int totalMovesToClear = 0;
 	public int movesCleared = 0;
 
@@ -19,6 +18,7 @@ public class TurnMan : MonoBehaviour {
 	private PlayerBehavior player;
 	private LevelMan levelMan;
 	private SpawnMan spawnMan;
+	private Monitor monitor;
 
 	void Awake()
 	{
@@ -29,6 +29,7 @@ public class TurnMan : MonoBehaviour {
 		scoreMan = (ScoreMan)FindObjectOfType(typeof(ScoreMan));
 		levelMan = (LevelMan)FindObjectOfType(typeof(LevelMan));
 		spawnMan = (SpawnMan)FindObjectOfType(typeof(SpawnMan));
+		monitor = (Monitor)FindObjectOfType(typeof(Monitor));
 	}
 
 	void Start () {
@@ -144,6 +145,7 @@ public class TurnMan : MonoBehaviour {
 
 		turnNmr++;
 		player.playerBlocked = false;	
+		monitor.UpdateMonitor();
 	}
 
 	public void SpawnNewRow()
