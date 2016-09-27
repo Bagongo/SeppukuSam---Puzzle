@@ -9,26 +9,24 @@ public class SpawnMan : MonoBehaviour {
 	public GameObject[] enemiesToAdd;
 	public List<GameObject> npcsPool;
 	public List<GameObject> enemiesPool;
+	public int startingNpcsNmr;
+	public int startinEnemiesNmr;
 	public int maxNpcXRow;
-	public int npcRowSizeTH;
-	public int npcsPoolTH;
-	public int enemiesPoolTH;
 	public float[] npcsRowDimProbs;
 	public float[] npcsPoolingProbs;
 	public float[] enemiesPoolingProbs;
+	public int gridW;
+	public int gridH;
 
 	private BoardMan boardMan;
 	private LevelMan levelMan;
 	private TurnMan turnMan;
-	private Monitor monitor;
-	private int gridW;
-	private int gridH;
+
 
 	void Awake()
 	{
 		turnMan = (TurnMan)FindObjectOfType(typeof(TurnMan));
 		levelMan = (LevelMan)FindObjectOfType(typeof(LevelMan)); 
-		monitor = (Monitor)FindObjectOfType(typeof(Monitor));
 		boardMan = (BoardMan)FindObjectOfType(typeof(BoardMan));
 
 		gridW = boardMan.gridW;
@@ -38,8 +36,7 @@ public class SpawnMan : MonoBehaviour {
 	void Start () {
 
 		InitializePoolsAndValues();
-		PopulatePool(npcsPool, npcsToAdd, 2);
-		PopulatePool(enemiesPool, enemiesToAdd, 1);
+		PopulatePools();
 		PopulateBoard();
 	}
 
@@ -51,10 +48,13 @@ public class SpawnMan : MonoBehaviour {
 		maxNpcXRow = gridW / 2;
 	}
 
-	void PopulatePool(List<GameObject> pool, GameObject[] toAddFrom, int upTo)
+	public void PopulatePools()
 	{			 
-		for(int i=0; i < upTo; i++)
-			pool.Add(toAddFrom[i]);	
+		for(int i=0; i < startingNpcsNmr; i++)
+			npcsPool.Add(npcsToAdd[i]);	
+
+		for(int i=0; i < startinEnemiesNmr; i++)
+			enemiesPool.Add(enemiesToAdd[i]);
 	}
 
 	public void PopulateBoard()
@@ -66,24 +66,6 @@ public class SpawnMan : MonoBehaviour {
 			else if(y== gridH-1)
 				SpawnEnemyRow(y);			
 		}
-	}
-
-	public void DifficultyIncreaser()
-	{
-		if(levelMan.Diff % npcRowSizeTH == 0)
-			maxNpcXRow = Mathf.Clamp(maxNpcXRow + 1, 1, gridW - 1);
-
-		if(levelMan.Diff % npcsPoolTH == 0)
-		{
-			if(npcsPool.Count < npcsToAdd.Length)
-				npcsPool.Add(npcsToAdd[npcsPool.Count]);						 
-		}
-
-		if(levelMan.Diff % enemiesPoolTH == 0)
-		{
-			if(enemiesPool.Count < enemiesToAdd.Length)
-				enemiesPool.Add(enemiesToAdd[enemiesPool.Count]);						 
-		}			
 	}
 
 	public void SpawnNpcsRow(int yPos)

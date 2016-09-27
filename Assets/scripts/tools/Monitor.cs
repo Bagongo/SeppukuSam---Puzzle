@@ -6,8 +6,6 @@ public class Monitor : MonoBehaviour {
 
 	public int level;
 	public int turn;
-	public int turnTreshold;
-	public int maxNpcXRow;
 	public LevelMan levelMan;
 	public SpawnMan spawnMan;
 	public TurnMan turnMan;
@@ -27,19 +25,20 @@ public class Monitor : MonoBehaviour {
 	public void UpdateMonitor()
 	{
 		level = levelMan.currentLvl;
-
 		turn = turnMan.turnNmr;
-		turnTreshold = turnMan.turnThreshold;
-
-		maxNpcXRow = spawnMan.maxNpcXRow;
 	}
 
-	public string ParseProbsArray(float[] probsArray)
+	public string ParseProbsArray (float[] probsArray, List<GameObject> pool)
 	{
 		string probsString = "";
 
 		for(int i=0; i < probsArray.Length; i++)
-			probsString += " " + probsArray[i];
+		{
+//			if(pool.Count > 0)
+//				probsString += pool[i].name + ":";
+
+			probsString += " " + probsArray[i] + " ";
+		}
 
 		return probsString;
 	}
@@ -48,8 +47,10 @@ public class Monitor : MonoBehaviour {
 	{
 		levelMan.currentLvl = 1;
 		spawnMan.InitializePoolsAndValues();
+		spawnMan.PopulatePools();
 		
 		for(int i=1; i < level; i++)
 			levelMan.NextLevel();
 	}
+
 }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEditor;
 
 
@@ -22,9 +23,9 @@ public class MonitorScriptEditor : Editor {
 		monitor.turnMan.turnThreshold = EditorGUILayout.IntField("Treshold",  monitor.turnMan.turnThreshold);
 
 		EditorGUILayout.LabelField("Max npcs x row: ", monitor.spawnMan.maxNpcXRow.ToString());
-		EditorGUILayout.LabelField("Npcs row: ", monitor.ParseProbsArray(monitor.spawnMan.npcsRowDimProbs));
-		EditorGUILayout.LabelField("Npcs pooling: ", monitor.ParseProbsArray(monitor.spawnMan.npcsPoolingProbs));
-		EditorGUILayout.LabelField("Enemies pooling: ", monitor.ParseProbsArray(monitor.spawnMan.enemiesPoolingProbs));			
+		EditorGUILayout.LabelField("Npcs row: ", monitor.ParseProbsArray(monitor.spawnMan.npcsRowDimProbs, new List<GameObject>()));
+		EditorGUILayout.LabelField("Npcs pooling: ", monitor.ParseProbsArray(monitor.spawnMan.npcsPoolingProbs, monitor.spawnMan.npcsPool));
+		EditorGUILayout.LabelField("Enemies pooling: ", monitor.ParseProbsArray(monitor.spawnMan.enemiesPoolingProbs, monitor.spawnMan.enemiesPool));			
 	}
 
 	
