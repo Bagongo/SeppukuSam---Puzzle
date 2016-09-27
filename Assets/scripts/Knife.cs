@@ -11,7 +11,7 @@ public class Knife : EntityBehavior {
 	void Start()
 	{
 		player = (PlayerBehavior)FindObjectOfType(typeof(PlayerBehavior));
-		GetComponent<SpriteRenderer>().flipX = Random.value > 0.5 ? true : false;
+		//GetComponent<SpriteRenderer>().flipX = Random.value > 0.5 ? true : false;
 	}
 
 	public void LaunchKnife(int[] target)

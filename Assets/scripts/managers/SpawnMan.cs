@@ -71,7 +71,7 @@ public class SpawnMan : MonoBehaviour {
 	public void SpawnNpcsRow(int yPos)
 	{
 		npcsRowDimProbs = CreateProbs(maxNpcXRow, turnMan.turnNmr);
-		int npcQuant = Mathf.Clamp((int)Choose(npcsRowDimProbs) + 1, 1, maxNpcXRow);
+		int npcQuant = Mathf.Clamp(Choose(npcsRowDimProbs) + 1, 1, maxNpcXRow);
 		List<int> availableSlots = new List<int>();
 
 		for(int i=0; i < gridW; i++)
@@ -80,7 +80,7 @@ public class SpawnMan : MonoBehaviour {
 		for(int i=1; i <= npcQuant; i++)
 		{
 			npcsPoolingProbs = CreateProbs(npcsPool.Count, levelMan.Diff);
-			int idx = (int)Choose(npcsPoolingProbs);
+			int idx = Choose(npcsPoolingProbs);
 			GameObject npc = npcsPool[idx];
 			int xPos = availableSlots[Random.Range(0, availableSlots.Count)];
 
@@ -94,14 +94,14 @@ public class SpawnMan : MonoBehaviour {
 	public void SpawnEnemyRow(int yPos)
 	{
 		enemiesPoolingProbs = CreateProbs(enemiesPool.Count, levelMan.Diff);
-		int idx = (int)Choose(enemiesPoolingProbs);
+		int idx = Choose(enemiesPoolingProbs);
 		GameObject enemy = enemiesPool[idx];
 		int xPos = Random.Range(0, gridW - 1);
 
 		boardMan.InstantiateSingleEntity(enemy, new int[]{xPos, yPos});
 	}
 
-	float[] CreateProbs(int dim, int increment)
+	float[] CreateProbs (int dim, float increment)
 	{
 		float[] probs = new float[dim];
 
@@ -111,7 +111,7 @@ public class SpawnMan : MonoBehaviour {
 		return probs;
 	}
 
-	float Choose (float[] probs) 
+	int Choose (float[] probs) 
 	{
         float total = 0;
 

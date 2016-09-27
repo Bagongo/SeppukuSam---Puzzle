@@ -31,13 +31,17 @@ public class Monitor : MonoBehaviour {
 	public string ParseProbsArray (float[] probsArray, List<GameObject> pool)
 	{
 		string probsString = "";
+		float total = 0;
+
+		for(int i=0; i < probsArray.Length; i++)
+			total += probsArray[i]; 
 
 		for(int i=0; i < probsArray.Length; i++)
 		{
 //			if(pool.Count > 0)
 //				probsString += pool[i].name + ":";
 
-			probsString += " " + probsArray[i] + " ";
+			probsString += " " + ((probsArray[i]/total) * 100).ToString("0.0") + "% ";
 		}
 
 		return probsString;
