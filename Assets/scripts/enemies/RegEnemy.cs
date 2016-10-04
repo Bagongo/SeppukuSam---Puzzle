@@ -72,6 +72,6 @@ public class RegEnemy : EntityBehavior, IMovable, IAttacker{
 		entB.EliminateEntity();
 		//Trigger target animation
 		scoreMan.HonorAndScoreUpdater(entB, false);
-		Destroy(entB.gameObject);	
+		entB.DestroyEntity();	
 	}		
 }

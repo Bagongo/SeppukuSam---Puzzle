@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class EntityBehavior : MonoBehaviour {
 
@@ -30,6 +31,7 @@ public class EntityBehavior : MonoBehaviour {
 	public float[] speedModifiers;
 	public Animator anim;
 	public SpriteRenderer sprtRend;
+	public List <int[]> formerPositions;
 
 	protected GameObject knife;
 	protected float cachedSpeed;
@@ -51,6 +53,7 @@ public class EntityBehavior : MonoBehaviour {
 		sprtRend = GetComponent<SpriteRenderer>();
 
 		cachedSpeed = speed;
+		formerPositions = new List<int[]>();
 	}
 
 	public virtual void FinalizeMovement()
@@ -61,6 +64,7 @@ public class EntityBehavior : MonoBehaviour {
 		if(anim && nextPos[1] != 0)
 			anim.SetBool("isMoving", isMoving);
 
+		PosRecorder(currentPos);
 		currentPos = nextPos;
 		transform.position = grid[currentPos[0], currentPos[1]].transform.position;
 		grid[currentPos[0], currentPos[1]].GetComponent<SpriteRenderer>().color = Color.white;
@@ -87,6 +91,11 @@ public class EntityBehavior : MonoBehaviour {
 			else 
 				movesCompleted = 0;											
 		}
+	}
+
+	public void PosRecorder(int[] formerPos)
+	{
+		formerPositions.Add(formerPos);			
 	}
 
 	public void EraseRemainingMoves()
@@ -228,5 +237,10 @@ public class EntityBehavior : MonoBehaviour {
 			DropKnife(currentPos);
 
 		boardMan.RemoveFromGrid(posToEliminateAt);
+	}
+
+	public void DestroyEntity()
+	{
+		Destroy(this.gameObject);
 	}
 }
