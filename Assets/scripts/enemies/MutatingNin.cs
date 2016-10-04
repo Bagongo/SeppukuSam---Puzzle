@@ -66,6 +66,7 @@ public class MutatingNin : EntityBehavior {
 		transform.parent = realID.transform;
 	
 		npcB.EliminateEntity();
+		npcB.DestroyEntity();
 
 		boardMan.entities[eneB.nextPos[0], eneB.nextPos[1]] = eneB.gameObject;
 			

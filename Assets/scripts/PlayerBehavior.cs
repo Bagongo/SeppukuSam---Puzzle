@@ -144,7 +144,7 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 		entB.EliminateEntity();
 		//Trigger target animation
 		scoreMan.HonorAndScoreUpdater(entB, true);
-		Destroy(entB.gameObject);	
+		entB.DestroyEntity();
 	}
 
 	public IEnumerator KnifeImpact()

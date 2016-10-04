@@ -229,4 +229,9 @@ public class EntityBehavior : MonoBehaviour {
 
 		boardMan.RemoveFromGrid(posToEliminateAt);
 	}
+
+	public void DestroyEntity()
+	{
+		Destroy(this.gameObject);
+	}
 }
