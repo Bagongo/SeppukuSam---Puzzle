@@ -27,8 +27,14 @@ public class EntityBehavior : MonoBehaviour {
 	public int gridH;
 	public Castle castle;
 	public float speed;
+	public float[] speedModifiers;
+	public Animator anim;
+	public SpriteRenderer sprtRend;
 
 	protected GameObject knife;
+	protected float cachedSpeed;
+	protected float prevSpeed;
+
 
 	protected virtual void Awake()
 	{
@@ -40,15 +46,25 @@ public class EntityBehavior : MonoBehaviour {
 
 		turnMan = (TurnMan)FindObjectOfType(typeof(TurnMan));
 		scoreMan = (ScoreMan)FindObjectOfType(typeof(ScoreMan));
-		castle = (Castle)FindObjectOfType(typeof(Castle));	
+		castle = (Castle)FindObjectOfType(typeof(Castle));
+		anim = GetComponent<Animator>();
+		sprtRend = GetComponent<SpriteRenderer>();
+
+		cachedSpeed = speed;
 	}
 
 	public virtual void FinalizeMovement()
 	{
 		isMoving = false;
+		speed = cachedSpeed;
+
+		if(anim && nextPos[1] != 0)
+			anim.SetBool("isMoving", isMoving);
+
 		currentPos = nextPos;
 		transform.position = grid[currentPos[0], currentPos[1]].transform.position;
 		grid[currentPos[0], currentPos[1]].GetComponent<SpriteRenderer>().color = Color.white;
+		sprtRend.sortingOrder = - currentPos[1];
 		LookForKnife();	
 		SortNextMove();
 	}
@@ -93,6 +109,11 @@ public class EntityBehavior : MonoBehaviour {
         {
 			transform.position = Vector3.MoveTowards(transform.position, endPos, speed * Time.deltaTime);
 			sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
+
+			if(anim)
+				anim.SetBool("isMoving", isMoving);
+
+//			sprtRend.sortingOrder = Mathf.RoundToInt(transform.position.y * 100);
 			
             yield return null;
         }
@@ -123,6 +144,23 @@ public class EntityBehavior : MonoBehaviour {
 		return availablePos;
 	}
 
+	float SpeedModder(float variationFactNeg, float variationFactPos)
+	{
+		float newSpeed;
+
+		if(nmbrOfMoves < 2)
+		{
+			newSpeed = Random.Range(speed - speed/variationFactNeg, speed + speed/variationFactPos);
+			prevSpeed = newSpeed;
+		}
+		else 
+		{
+			newSpeed = speed;
+		}
+
+		return newSpeed;
+	}
+
 	public virtual void ElaborateMove()
 	{
 		if(this is IMovable)
@@ -136,6 +174,7 @@ public class EntityBehavior : MonoBehaviour {
 				grid[nextPos[0], nextPos[1]].GetComponent<SpriteRenderer>().color = moveColor;
 				boardMan.UpdateGrid(currentPos, nextPos);				
 				Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
+				//speed = SpeedModder(speedModifiers[0], speedModifiers[1]);
 				isMoving = true;
 				StartCoroutine(SmoothMovement(newPos));
 			}
@@ -167,6 +206,9 @@ public class EntityBehavior : MonoBehaviour {
 		nextPos = new int[]{currentPos[0], currentPos[1] - 1};
 		boardMan.UpdateGrid(currentPos, nextPos);
 		Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
+		isMoving = true;
+
+		//speed =  SpeedModder(speedModifiers[0]/2, speedModifiers[1]/2) * 1.2f;
 		StartCoroutine(SmoothMovement(newPos));
 	}
 

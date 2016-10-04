@@ -1,11 +1,12 @@
 fileFormatVersion: 2
-guid: 98315ca1545c344d880d6115cf40eec4
-timeCreated: 1468186626
+guid: eee123d2f93e048cab92e8b7ac2330c2
+timeCreated: 1474993354
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: ninja_64_0
-    21300002: ninja_64_1
+    21300000: nin-001_0
+    21300002: nin-001_1
+    21300004: nin-001_2
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -32,7 +33,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     filterMode: 0
-    aniso: -1
+    aniso: 16
     mipBias: -1
     wrapMode: 1
   nPOTScale: 0
@@ -52,43 +53,39 @@ TextureImporter:
   buildTargetSettings: []
   spriteSheet:
     sprites:
-    - name: ninja_64_0
+    - name: nin-001_0
       rect:
         serializedVersion: 2
-        x: 17
-        y: 15
-        width: 32
-        height: 32
+        x: 0
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -10, y: 16}
-        - {x: -11, y: 15}
-        - {x: -11, y: -16}
-        - {x: 10, y: -16}
-        - {x: 16, y: -11}
-        - {x: 16, y: 10}
-        - {x: 6, y: 16}
-    - name: ninja_64_1
+      outline: []
+    - name: nin-001_1
       rect:
         serializedVersion: 2
-        x: 80
-        y: 15
-        width: 32
-        height: 32
+        x: 64
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -6, y: 16}
-        - {x: -10, y: 13}
-        - {x: -10, y: -14}
-        - {x: -5, y: -16}
-        - {x: 11, y: -16}
-        - {x: 16, y: -8}
-        - {x: 16, y: 9}
-        - {x: 12, y: 16}
+      outline: []
+    - name: nin-001_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
     outline: []
   spritePackingTag: 
   userData: 

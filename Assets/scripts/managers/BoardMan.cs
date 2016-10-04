@@ -46,6 +46,7 @@ public class BoardMan : MonoBehaviour {
 		EntityBehavior entB = newEntity.GetComponent<EntityBehavior>();
 		entB.currentPos = new int[]{atPos[0], atPos[1]};
 		entities[atPos[0], atPos[1]] = newEntity;
+		entB.GetComponent<SpriteRenderer>().sortingOrder = entB.currentPos[1];
 
 		return newEntity;
 	}

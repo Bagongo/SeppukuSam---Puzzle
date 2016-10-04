@@ -5,8 +5,6 @@ public class RoamerNpc : RegNpc, IMovable {
 
 	public bool switchedDir = false;
 
-	private SpriteRenderer sprtRend;
-
 	void Start(){
 
 		moveDirection[0] = Random.value < 0.5f ? -1 : 1;

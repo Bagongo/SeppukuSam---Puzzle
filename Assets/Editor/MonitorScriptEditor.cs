@@ -11,6 +11,8 @@ public class MonitorScriptEditor : Editor {
 	{
 		Monitor monitor = (Monitor)target;
 
+		monitor.turnMan = (TurnMan) EditorGUI.ObjectField(new Rect(3, 3, 3, 20), "TurnMan", monitor.turnMan, typeof(TurnMan));
+
 		monitor.level = EditorGUILayout.IntField("Level", monitor.level);
         EditorGUILayout.LabelField("Difficulty", monitor.levelMan.Diff.ToString());
 
