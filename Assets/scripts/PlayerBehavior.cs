@@ -123,10 +123,10 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 	public void Attack(int[] targetPos)
 	{
 		//Debug.Log("player Attacking....");
-		//animation here or something else...
 		if(boardMan.entities[targetPos[0], targetPos[1]] != null)
 		{
 			EntityBehavior target = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
+			//StartAnimation
 			KillEntity(target);
 		}
 
@@ -141,8 +141,10 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 
 	public void KillEntity(EntityBehavior entB)
 	{
-		scoreMan.HonorAndScoreUpdater(entB, true);
 		entB.EliminateEntity();
+		//Trigger target animation
+		scoreMan.HonorAndScoreUpdater(entB, true);
+		Destroy(entB.gameObject);	
 	}
 
 	public IEnumerator KnifeImpact()

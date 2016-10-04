@@ -85,7 +85,9 @@ public class SpawnMan : MonoBehaviour {
 			int xPos = availableSlots[Random.Range(0, availableSlots.Count)];
 
 			if(boardMan.entities[xPos, yPos - 1] == null)
-				boardMan.InstantiateSingleEntity(npc, new int[]{xPos, yPos});	
+			{
+				boardMan.InstantiateSingleEntity(npc, new int[]{xPos, yPos});
+			}	
 
 			availableSlots.Remove(xPos);
 		}	
@@ -97,7 +99,6 @@ public class SpawnMan : MonoBehaviour {
 		int idx = Choose(enemiesPoolingProbs);
 		GameObject enemy = enemiesPool[idx];
 		int xPos = Random.Range(0, gridW - 1);
-
 		boardMan.InstantiateSingleEntity(enemy, new int[]{xPos, yPos});
 	}
 

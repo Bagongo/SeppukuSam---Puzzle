@@ -227,7 +227,6 @@ public class EntityBehavior : MonoBehaviour {
 		if(hasKnife && canDrop)
 			DropKnife(currentPos);
 
-		Destroy(this.gameObject);	
 		boardMan.RemoveFromGrid(posToEliminateAt);
 	}
 }

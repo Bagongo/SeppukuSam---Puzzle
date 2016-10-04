@@ -3,7 +3,7 @@ using System.Collections;
 
 public class LevelMan : MonoBehaviour {
 
-	public int currentLvl = 1;
+	public int currentLvl = 0;
 	public int npcRowSizeTH;
 	public int npcsPoolTH;
 	public int enemiesPoolTH;
@@ -25,6 +25,11 @@ public class LevelMan : MonoBehaviour {
 		turnMan = (TurnMan)FindObjectOfType(typeof(TurnMan));
 	}
 
+	void Start()
+	{
+		NextLevel();
+	}
+
 	public void NextLevel()
 	{
 		currentLvl++;
@@ -36,7 +41,7 @@ public class LevelMan : MonoBehaviour {
 		turnMan.turnThreshold += 1;
 
 		if(Diff % npcRowSizeTH == 0)
-		spawnMan.maxNpcXRow = Mathf.Clamp(spawnMan.maxNpcXRow + 1, 1, spawnMan.gridW - 1);
+			spawnMan.maxNpcXRow = Mathf.Clamp(spawnMan.maxNpcXRow + 1, 1, spawnMan.gridW - 1);
 
 		if((int)Diff % npcsPoolTH == 0)
 		{
@@ -48,7 +53,7 @@ public class LevelMan : MonoBehaviour {
 		{
 			if(spawnMan.enemiesPool.Count < spawnMan.enemiesToAdd.Length)
 				spawnMan.enemiesPool.Add(spawnMan.enemiesToAdd[spawnMan.enemiesPool.Count]);						 
-		}			
+		}							
 	}
 		
 

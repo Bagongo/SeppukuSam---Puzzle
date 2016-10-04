@@ -63,12 +63,15 @@ public class RegEnemy : EntityBehavior, IMovable, IAttacker{
 	public void Attack(int[] targetPos)
 	{
 		EntityBehavior entB = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
+		//StartAnimation
 		KillEntity(entB);
 	}
 
 	public void KillEntity(EntityBehavior entB)
 	{
-		scoreMan.HonorAndScoreUpdater(entB, false);
 		entB.EliminateEntity();
+		//Trigger target animation
+		scoreMan.HonorAndScoreUpdater(entB, false);
+		Destroy(entB.gameObject);	
 	}		
 }
