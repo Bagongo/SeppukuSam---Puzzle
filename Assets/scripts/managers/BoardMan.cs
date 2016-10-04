@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class BoardMan : MonoBehaviour {
 
@@ -13,7 +14,9 @@ public class BoardMan : MonoBehaviour {
 	public GameObject [,] grid; 
 	public GameObject[,] entities;
 	public GameObject[,] items;
-	public GameObject player; 
+	public GameObject player;
+	public List<Dictionary<GameObject, int[]>> snapShots; 
+	public int maxSnaps;
 
 	void Awake(){
 
@@ -32,6 +35,8 @@ public class BoardMan : MonoBehaviour {
 		}
 
 		transform.position = new Vector3(transform.position.x - grid.GetLength(0)/2, transform.position.y - grid.GetLength(1)/2, 0);
+
+		snapShots = new List<Dictionary<GameObject, int[]>>();
 	}
 
 	void Start()
@@ -62,6 +67,53 @@ public class BoardMan : MonoBehaviour {
 	{
 		if(entities[pos[0], pos[1]] != null)
 			entities[pos[0], pos[1]] = null;												
+	}
+
+	public void TakeSnapshot()
+	{
+		if(snapShots.Count >= maxSnaps)
+			snapShots.RemoveAt(0);
+
+		Dictionary<GameObject, int[]> newSnap = new Dictionary<GameObject, int[]>();
+
+		for(int y = gridH-1; y >= 1; y--)
+		{
+			for(int x=0; x < gridW; x++)
+			{
+				if(entities[x,y] != null)
+				{
+					EntityBehavior entB = entities[x,y].GetComponent<EntityBehavior>();
+					newSnap.Add(entities[x,y], entB.currentPos);
+				}
+			}
+		}
+
+		snapShots.Add(newSnap);
+	}
+
+	public void RemoveSnapshots(int fromIdx, bool addNewSnap)
+	{
+		for(int i = fromIdx; i < snapShots.Count; i++)
+			snapShots.RemoveAt(i);
+
+		if(addNewSnap)
+			TakeSnapshot();
+	}
+
+	public void ClearBoardFromEntities()
+	{
+		for(int y = gridH-1; y>=1; y--)
+		{
+			for(int x=0; x< gridW; x++)
+			{
+				if(entities[x,y] != null)
+				{
+					EntityBehavior entB = entities[x,y].GetComponent<EntityBehavior>();
+					entB.EliminateEntity();
+					entB.DestroyEntity();
+				}
+			}
+		}
 	}
 }
 

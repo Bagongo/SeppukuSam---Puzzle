@@ -38,8 +38,8 @@ public class SpawnMan : MonoBehaviour {
 		InitializePoolsAndValues();
 		PopulatePools();
 		PopulateBoard();
+		boardMan.TakeSnapshot();
 	}
-
 
 	public void InitializePoolsAndValues()
 	{

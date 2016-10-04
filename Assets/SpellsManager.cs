@@ -11,19 +11,7 @@ public class SpellsManager : MonoBehaviour {
 	{
 		turnMan = (TurnMan)FindObjectOfType(typeof(TurnMan));
 		boardMan = (BoardMan)FindObjectOfType(typeof(BoardMan));
-
 	}
-
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
 
 	public void RewindMoves(int rewindsNmr)
 	{
@@ -61,6 +49,33 @@ public class SpellsManager : MonoBehaviour {
 			}
 		}
 
+		turnMan.turnNmr -= rewindsNmr;
+	}
+
+
+	//deal with animation stopping....
+	public void RewindMoves(int rewindsNmr)
+	{
+		int idx = boardMan.snapShots.Count - rewindsNmr - 1;
+		idx = Mathf.Clamp(idx, 0, idx);
+		Dictionary<GameObject, int[]> snapToLoad = boardMan.snapShots[idx];
+		Dictionary<GameObject, int[]> snapClone = new Dictionary<GameObject, int[]>();
+
+		foreach(KeyValuePair<GameObject, int[]> pair in snapToLoad)
+			snapClone.Add(pair.Key, pair.Value);
+
+		boardMan.ClearBoardFromEntities();
+
+		foreach(KeyValuePair<GameObject, int[]> pair in snapClone)
+		{
+			if (pair.Key != null)
+			{
+				pair.Key.GetComponent<EntityBehavior>().hasKnife = false; // temporary solution...?
+				boardMan.InstantiateSingleEntity(pair.Key, pair.Value);
+			} 
+		}
+
+		boardMan.RemoveSnapshots(rewindsNmr, true);											
 		turnMan.turnNmr -= rewindsNmr;
 	}
 

@@ -144,7 +144,8 @@ public class TurnMan : MonoBehaviour {
 			SpawnNewRow();
 
 		turnNmr++;
-		player.playerBlocked = false;	
+		player.playerBlocked = false;
+		boardMan.TakeSnapshot();	
 		monitor.UpdateMonitor();
 	}
 
