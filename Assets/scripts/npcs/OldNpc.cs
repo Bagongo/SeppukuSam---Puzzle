@@ -15,7 +15,6 @@ public class OldNpc : RegNpc {
 		if(movesEveryOtherTurn && hasMovedPrevTurn)
 		{
 			hasMovedPrevTurn = false;
-			PosRecorder(currentPos);
 			SortNextMove();
 		}
 		else
@@ -24,11 +23,5 @@ public class OldNpc : RegNpc {
 			base.ElaborateMove();
 		}
 
-	}
-
-	public void RewindPrevTurnStates(int howManyTurns)
-	{
-		for(int i=1; i <= howManyTurns * nmbrOfMoves; i++)
-			hasMovedPrevTurn = !hasMovedPrevTurn;
 	}
 }
