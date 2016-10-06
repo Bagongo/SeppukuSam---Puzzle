@@ -91,10 +91,13 @@ public class BoardMan : MonoBehaviour {
 		snapShots.Add(newSnap);
 	}
 
-	public void RemoveSnapshots(int fromIdx, bool addNewSnap)
+	public void RemoveSnapshots(int snapsToPop, bool addNewSnap)
 	{
-		for(int i = fromIdx; i < snapShots.Count; i++)
-			snapShots.RemoveAt(i);
+		if(snapShots.Count >= snapsToPop)
+		{
+			for(int i = snapShots.Count-1 - snapsToPop; i < snapShots.Count; i++)
+				snapShots.RemoveAt(i);
+		}
 
 		if(addNewSnap)
 			TakeSnapshot();
@@ -115,5 +118,7 @@ public class BoardMan : MonoBehaviour {
 			}
 		}
 	}
+
+
 }
 

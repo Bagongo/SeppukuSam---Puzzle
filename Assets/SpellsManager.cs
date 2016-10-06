@@ -17,28 +17,39 @@ public class SpellsManager : MonoBehaviour {
 	//deal with animation stopping....
 	public void RewindMoves(int rewindsNmr)
 	{
-		int idx = boardMan.snapShots.Count - rewindsNmr - 1;
-		idx = Mathf.Clamp(idx, 0, boardMan.snapShots.Count - 1);
-		Dictionary<GameObject, int[]> snapToLoad = boardMan.snapShots[idx];
-		Dictionary<GameObject, int[]> snapClone = new Dictionary<GameObject, int[]>();
+		Debug.Log(boardMan.snapShots.Count);
 
-		foreach(KeyValuePair<GameObject, int[]> pair in snapToLoad)
-			snapClone.Add(pair.Key, pair.Value);
-
-		boardMan.ClearBoardFromEntities();
-
-		foreach(KeyValuePair<GameObject, int[]> pair in snapClone)
+		if(boardMan.snapShots.Count > rewindsNmr)
 		{
-			if (pair.Key != null)
-			{
-				pair.Key.GetComponent<EntityBehavior>().hasKnife = false; // temporary solution...?
-				boardMan.InstantiateSingleEntity(pair.Key, pair.Value);
-			} 
-		}
+			int idx = boardMan.snapShots.Count-1 - rewindsNmr;
+			idx = Mathf.Clamp(idx, 0, boardMan.snapShots.Count - 1);
+			Dictionary<GameObject, int[]> snapToLoad = boardMan.snapShots[idx];
+			Dictionary<GameObject, int[]> snapClone = new Dictionary<GameObject, int[]>();
 
-		boardMan.RemoveSnapshots(rewindsNmr, true);											
-		turnMan.turnNmr -= rewindsNmr;
-		turnMan.turnNmr = Mathf.Clamp(turnMan.turnNmr, 0, turnMan.turnThreshold);
+			foreach(KeyValuePair<GameObject, int[]> pair in snapToLoad)
+				snapClone.Add(pair.Key, pair.Value);
+
+			boardMan.ClearBoardFromEntities();
+
+			foreach(KeyValuePair<GameObject, int[]> pair in snapClone)
+			{
+				if (pair.Key != null)
+				{
+					pair.Key.GetComponent<EntityBehavior>().hasKnife = false; // temporary solution...?
+					boardMan.InstantiateSingleEntity(pair.Key, pair.Value);
+				} 
+			}
+
+			boardMan.RemoveSnapshots(rewindsNmr, true);											
+			turnMan.turnNmr -= rewindsNmr;
+			turnMan.turnNmr = Mathf.Clamp(turnMan.turnNmr, 0, turnMan.turnThreshold);
+		}
+		else
+			Debug.Log("Not enough snaps to rewind.....");
+
+		Debug.Log(boardMan.snapShots.Count);
+
+					
 	}
 
 
