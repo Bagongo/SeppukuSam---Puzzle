@@ -38,32 +38,6 @@ public class TurnMan : MonoBehaviour {
 		player = FindObjectOfType<PlayerBehavior>();					
 	}
 
-	public void AllEntitiesMoved()
-	{
-		player.Attack(new int[]{player.currentPos[0], player.currentPos[1]+1});
-	}
-
-	public void ResolveFirstRow()
-	{		
-		int entitiesFound = 0;
-
-		for(int x=0; x<gridW; x++)
-		{
-			if (boardMan.entities[x,1] != null)
-			{
-				entitiesFound++;
-				EntityBehavior entB = boardMan.entities[x,1].GetComponent<EntityBehavior>();
-				totalMovesToClear++;
-				entB.GoToCastle();
-			}
-		}
-
-		if(entitiesFound < 1)
-			NextTurn();		
-		else
-			StartCoroutine("CheckIfEntitiesFinishedMoving");							
-	}
-
 	public void NpcsAndEnemiesMove()
 	{
 		int entitiesFound = 0;
@@ -91,12 +65,33 @@ public class TurnMan : MonoBehaviour {
 		}
 
 		if(entitiesFound < 1)
-			AllEntitiesMoved();
+			SpawnAndPlAttack();
 		else
-			StartCoroutine("CheckIfEntitiesFinishedMoving");		
+			StartCoroutine("CheckIfEntitiesFinishedMoving", false);		
 	}
 
-	IEnumerator CheckIfEntitiesFinishedMoving()
+	public void ResolveFirstRow()
+	{		
+		int entitiesFound = 0;
+
+		for(int x=0; x<gridW; x++)
+		{
+			if (boardMan.entities[x,1] != null)
+			{
+				entitiesFound++;
+				EntityBehavior entB = boardMan.entities[x,1].GetComponent<EntityBehavior>();
+				totalMovesToClear++;
+				entB.GoToCastle();
+			}
+		}
+
+		if(entitiesFound < 1)
+			NextTurn();		
+		else
+			StartCoroutine("CheckIfEntitiesFinishedMoving", true);							
+	}
+
+	IEnumerator CheckIfEntitiesFinishedMoving(bool endTurn)
 	{
 		while(movesCleared < totalMovesToClear)
 			yield return new WaitForSeconds(0.01f);
@@ -105,15 +100,21 @@ public class TurnMan : MonoBehaviour {
 
 		movesCleared = 0;
 		totalMovesToClear = 0;
-		AllEntitiesMoved();
+
+		if(endTurn)
+			NextTurn();
+		else
+			SpawnAndPlAttack();
 	}
 
-	public bool ContinueGame()
+	public void SpawnAndPlAttack()
 	{
-		if(scoreMan.honor > 0)
-			return true;
+		if(turnNmr >= turnThreshold)
+			CheckWaveClearance();
 		else
-			return false;
+			SpawnNewRow();
+
+		player.Attack(new int[]{player.currentPos[0], player.currentPos[1]+1});
 	}
 
 	void NextWave()
@@ -138,11 +139,6 @@ public class TurnMan : MonoBehaviour {
 
 	public void NextTurn()
 	{
-		if(turnNmr >= turnThreshold)
-			CheckWaveClearance();
-		else
-			SpawnNewRow();
-
 		turnNmr++;
 		player.playerBlocked = false;	
 		monitor.UpdateMonitor();
@@ -154,6 +150,14 @@ public class TurnMan : MonoBehaviour {
 			spawnMan.SpawnEnemyRow(gridH-1);
 		else if(turnNmr%4 == 0 || turnNmr%5 == 0 || turnNmr%6 ==0)
 			spawnMan.SpawnNpcsRow(gridH-1);
+	}
+
+	public bool ContinueGame()
+	{
+		if(scoreMan.honor > 0)
+			return true;
+		else
+			return false;
 	}
 
 	public void GameOver()
