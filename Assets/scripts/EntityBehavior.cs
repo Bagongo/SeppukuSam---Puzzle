@@ -34,7 +34,7 @@ public class EntityBehavior : MonoBehaviour {
 	protected GameObject knife;
 	protected float cachedSpeed;
 	protected float prevSpeed;
-
+	protected Vector3 posOffset = Vector3.zero;
 
 	protected virtual void Awake()
 	{
@@ -62,7 +62,7 @@ public class EntityBehavior : MonoBehaviour {
 			anim.SetBool("isMoving", isMoving);
 
 		currentPos = nextPos;
-		transform.position = grid[currentPos[0], currentPos[1]].transform.position;
+		transform.position = grid[currentPos[0], currentPos[1]].transform.position + posOffset;
 		grid[currentPos[0], currentPos[1]].GetComponent<SpriteRenderer>().color = Color.white;
 		sprtRend.sortingOrder = - currentPos[1];
 		LookForKnife();	

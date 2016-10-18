@@ -3,7 +3,7 @@ using System.Collections;
 
 public class LevelMan : MonoBehaviour {
 
-	public int currentLvl = 0;
+	public int currentLvl;
 	public int npcRowSizeTH;
 	public int npcsPoolTH;
 	public int enemiesPoolTH;

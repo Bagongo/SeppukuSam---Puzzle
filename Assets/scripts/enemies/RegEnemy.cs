@@ -5,6 +5,7 @@ using System.Linq;
 public class RegEnemy : EntityBehavior, IMovable, IAttacker{
 
 	protected int[] target;
+	protected EntityBehavior currentTarget;
 
 	public int[] EvaluateMovement()
 	{
@@ -62,17 +63,18 @@ public class RegEnemy : EntityBehavior, IMovable, IAttacker{
 
 	public void Attack(int[] targetPos)
 	{
-		EntityBehavior entB = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
+		currentTarget = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
 		//StartAnimation
-		KillEntity(entB);
+		KillEntity();
 	}
 
-	public void KillEntity(EntityBehavior entB)
+	public void KillEntity()
 	{
-		entB.EliminateEntity();
+		currentTarget.EliminateEntity();
 		//Trigger target animation
-		scoreMan.HonorAndScoreUpdater(entB, false);
-		entB.DestroyEntity();
-
-	}		
+		scoreMan.HonorAndScoreUpdater(currentTarget, false);
+		currentTarget.DestroyEntity();
+		currentTarget = null;
+	}
+			
 }

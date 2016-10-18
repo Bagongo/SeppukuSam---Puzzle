@@ -9,7 +9,13 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 	public int movesCollected = 0;
 	public List <PlayerMoves> moves;
 	public bool playerBlocked = false;
+	public EntityBehavior currentTarget;
 
+	void Start()
+	{
+		posOffset = new Vector3(0.25f, 0.4f, 0);
+		transform.position += posOffset;
+	}
 
 	void Update () {
 
@@ -109,7 +115,7 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 	{
 		nextPos = EvaluateMovement();
 		//boardMan.UpdateGrid(currentPos, nextPos);   reactivate in case player row considers player as board unity (null and recreate on each move)........				
-		Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
+		Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position + posOffset;
 		StartCoroutine(SmoothMovement(newPos));
 	}
 
@@ -122,14 +128,19 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 
 	public void Attack(int[] targetPos)
 	{
-		//Debug.Log("player Attacking....");
 		if(boardMan.entities[targetPos[0], targetPos[1]] != null)
 		{
-			EntityBehavior target = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
-			//StartAnimation
-			KillEntity(target);
+			currentTarget = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
+			anim.SetTrigger("attack");
+			//KillEntity(target);
+			//AfterAttack();
 		}
+		else
+			AfterAttack();
+	}
 
+	public void AfterAttack()
+	{
 		if(turnMan.ContinueGame())			
 			turnMan.ResolveFirstRow();
 		else
@@ -139,12 +150,14 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 		}
 	}
 
-	public void KillEntity(EntityBehavior entB)
+	public void KillEntity()
 	{
-		entB.EliminateEntity();
+		currentTarget.EliminateEntity();
 		//Trigger target animation
-		scoreMan.HonorAndScoreUpdater(entB, true);
-		entB.DestroyEntity();
+		scoreMan.HonorAndScoreUpdater(currentTarget, true);
+		currentTarget.DestroyEntity();
+		currentTarget = null;
+		AfterAttack();
 	}
 
 	public IEnumerator KnifeImpact()
