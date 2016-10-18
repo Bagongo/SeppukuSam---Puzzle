@@ -109,10 +109,6 @@ public class EntityBehavior : MonoBehaviour {
         {
 			transform.position = Vector3.MoveTowards(transform.position, endPos, speed * Time.deltaTime);
 			sqrRemainingDistance = (transform.position - endPos).sqrMagnitude;
-
-			if(anim)
-				anim.SetBool("isMoving", isMoving);
-
 //			sprtRend.sortingOrder = Mathf.RoundToInt(transform.position.y * 100);
 			
             yield return null;
@@ -176,6 +172,10 @@ public class EntityBehavior : MonoBehaviour {
 				Vector3 newPos = grid[nextPos[0], nextPos[1]].transform.position;
 				//speed = SpeedModder(speedModifiers[0], speedModifiers[1]);
 				isMoving = true;
+
+				if(anim)
+					anim.SetBool("isMoving", isMoving);
+
 				StartCoroutine(SmoothMovement(newPos));
 			}
 		}
@@ -212,20 +212,15 @@ public class EntityBehavior : MonoBehaviour {
 		StartCoroutine(SmoothMovement(newPos));
 	}
 
-	public void EliminateEntity()
+	public void RemoveEntity()
 	{
-		int[] posToEliminateAt = isMoving ? nextPos : currentPos;
-
 		if(isMoving)
-		{
-			posToEliminateAt = nextPos;
 			EraseRemainingMoves();
-		}
-		else
-			posToEliminateAt = currentPos;
 
 		if(hasKnife && canDrop)
-			DropKnife(currentPos);
+			DropKnife(currentPos); // @posToElminateAt???
+
+		int[] posToEliminateAt = isMoving ? nextPos : currentPos;
 
 		boardMan.RemoveFromGrid(posToEliminateAt);
 	}

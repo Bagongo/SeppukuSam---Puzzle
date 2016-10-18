@@ -128,11 +128,12 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 
 	public void Attack(int[] targetPos)
 	{
-		Debug.Log("Attacking....");
+		//Debug.Log("Attacking....");
 
 		if(boardMan.entities[targetPos[0], targetPos[1]] != null)
 		{
 			currentTarget = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
+			currentTarget.RemoveEntity();
 			anim.SetTrigger("attack");
 			//KillEntity(target);
 			//AfterAttack();
@@ -152,9 +153,8 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 		}
 	}
 
-	public void KillEntity()
+	public void Kill()
 	{
-		currentTarget.EliminateEntity();
 		//Trigger target animation
 		scoreMan.HonorAndScoreUpdater(currentTarget, true);
 		currentTarget.DestroyEntity();

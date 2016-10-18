@@ -16,7 +16,7 @@ public class Castle : MonoBehaviour {
 
 //		if(turnMan.ContinueGame())
 //		{
-			entB.EliminateEntity();
+			entB.RemoveEntity();
 			Destroy(entB.gameObject);	
 			turnMan.movesCleared++;
 

@@ -32,7 +32,7 @@ public class Knife : EntityBehavior {
 
 			//entB.LookForKnife(); figure out if needed to be picked up first and dropped at elimination........
 
-			player.KillEntity();
+			player.Kill();
 		}
 
 		hasHit = true;
