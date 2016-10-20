@@ -30,6 +30,7 @@ public class EntityBehavior : MonoBehaviour {
 	public float[] speedModifiers;
 	public Animator anim;
 	public SpriteRenderer sprtRend;
+	public GameObject bloodSpray;
 
 	protected GameObject knife;
 	protected float cachedSpeed;
@@ -223,6 +224,15 @@ public class EntityBehavior : MonoBehaviour {
 		int[] posToEliminateAt = isMoving ? nextPos : currentPos;
 
 		boardMan.RemoveFromGrid(posToEliminateAt);
+	}
+
+	public void DyingAnim()
+	{
+		anim.SetTrigger("die");
+		Quaternion rotation = bloodSpray.transform.rotation;
+		GameObject blood = Instantiate(bloodSpray, transform.position, rotation) as GameObject;
+		blood.transform.parent = transform;
+		blood.transform.position = new Vector3(blood.transform.position.x, blood.transform.position.y, -1);
 	}
 
 	public void DestroyEntity()

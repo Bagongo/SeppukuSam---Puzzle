@@ -164,7 +164,12 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 	{
 		//Trigger target animation
 		scoreMan.HonorAndScoreUpdater(currentTarget, true);
-		currentTarget.DestroyEntity();
+
+		if(currentTarget.bloodSpray != null)
+			currentTarget.DyingAnim();
+		else
+			currentTarget.DestroyEntity();
+
 		currentTarget = null;
 		//AfterAttack();
 	}
