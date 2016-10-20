@@ -29,9 +29,7 @@ public class Knife : EntityBehavior {
 		if(boardMan.entities[targetPos[0], targetPos[1]] != null)
 		{
 			player.currentTarget = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
-
-			//entB.LookForKnife(); figure out if needed to be picked up first and dropped at elimination........
-
+			player.currentTarget.RemoveEntity();
 			player.Kill();
 		}
 

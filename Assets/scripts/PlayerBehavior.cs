@@ -85,7 +85,7 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 				break;
 			case PlayerMoves.knife:
 				StartCoroutine(KnifeImpact());
-				moveDirection = new int[]{0,0};
+				//moveDirection = new int[]{0,0};
 				return;
 			case PlayerMoves.left:
 				moveDirection = new int[]{-1,0,};
@@ -159,7 +159,7 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 		scoreMan.HonorAndScoreUpdater(currentTarget, true);
 		currentTarget.DestroyEntity();
 		currentTarget = null;
-		AfterAttack();
+		//AfterAttack();
 	}
 
 	public IEnumerator KnifeImpact()
@@ -180,15 +180,20 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 		knifeB.LaunchKnife(pos);
 
 		while(!knifeB.hasHit)
-			yield return new WaitForSeconds(0.1f);
+			yield return new WaitForSeconds(0.01f);
 
-		if(turnMan.ContinueGame())			
-			ElaborateMove();
-		else
-		{
-			//turnMan.GameOver();
-			ElaborateMove();
-		}
+		
+		SortNextMove();
+
+		Debug.Log("done w/ knife...");
+
+//		if(turnMan.ContinueGame())			
+//			ElaborateMove();
+//		else
+//		{
+//			//turnMan.GameOver();
+//			ElaborateMove();
+//		}
 
 	}	
 
