@@ -142,6 +142,13 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 			AfterAttack();
 	}
 
+	public void AttackWithKnife(int[] targetPos)
+	{
+		currentTarget = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
+		currentTarget.RemoveEntity();
+		Kill();	
+	}
+
 	public void AfterAttack()
 	{
 		if(turnMan.ContinueGame())			
@@ -175,6 +182,8 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 				break;
 		}
 
+		anim.SetTrigger("knife");
+
 		knife = Instantiate(boardMan.knifePrefab, grid[currentPos[0], currentPos[1]].transform.position, Quaternion.identity) as GameObject; 
 		Knife knifeB = knife.GetComponent<Knife>();
 		knifeB.LaunchKnife(pos);
@@ -182,18 +191,10 @@ public class PlayerBehavior : EntityBehavior, IMovable, IAttacker {
 		while(!knifeB.hasHit)
 			yield return new WaitForSeconds(0.01f);
 
-		
-		SortNextMove();
-
-		Debug.Log("done w/ knife...");
-
-//		if(turnMan.ContinueGame())			
-//			ElaborateMove();
+//		if(turnMan.ContinueGame)
+			SortNextMove();
 //		else
-//		{
-//			//turnMan.GameOver();
-//			ElaborateMove();
-//		}
+//			turnMan.GameOver();
 
 	}	
 

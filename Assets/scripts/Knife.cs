@@ -27,11 +27,7 @@ public class Knife : EntityBehavior {
 		items[targetPos[0], targetPos[1]] = this.gameObject;
 		
 		if(boardMan.entities[targetPos[0], targetPos[1]] != null)
-		{
-			player.currentTarget = boardMan.entities[targetPos[0], targetPos[1]].GetComponent<EntityBehavior>();
-			player.currentTarget.RemoveEntity();
-			player.Kill();
-		}
+			player.AttackWithKnife(targetPos);
 
 		hasHit = true;
 	}
