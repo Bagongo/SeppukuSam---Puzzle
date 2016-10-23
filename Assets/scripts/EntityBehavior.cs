@@ -252,6 +252,26 @@ public class EntityBehavior : MonoBehaviour {
 		blood.GetComponent<ParticleSystem>().gravityModifier = Random.Range(gravity - 1, gravity + 1);
 	}
 
+	IEnumerator FadeOut()
+	{
+		Color color = GetComponent<SpriteRenderer>().color;
+		float tempOpacity = color.a;
+
+		while(tempOpacity > 0)
+		{
+			tempOpacity -= speed * Time.deltaTime * 2;
+			color = new Color(color.r, color.g, color.b, tempOpacity);
+			GetComponent<SpriteRenderer>().color = color;
+
+			yield return null; 
+		}
+	}
+
+	public void StartFading()
+	{
+		StartCoroutine("FadeOut");
+	}
+
 	public void DyingAnim()
 	{
 		anim.SetTrigger("die");
