@@ -226,13 +226,36 @@ public class EntityBehavior : MonoBehaviour {
 		boardMan.RemoveFromGrid(posToEliminateAt);
 	}
 
+	void CreateRandomBloodGush()
+	{
+		Quaternion tempRotation = bloodSpray.transform.rotation;
+		Quaternion rotation;
+		Vector3 position;
+
+		if(Random.value < .5f)
+		{
+			rotation = Quaternion.Inverse(tempRotation);
+			rotation = new Quaternion(rotation.x, rotation.y, rotation.z, 0);
+			position = new Vector3(transform.position.x + 0.3f, transform.position.y, transform.position.x);
+		}
+		else
+		{
+			rotation = tempRotation;
+			position = transform.position;
+		}
+
+		GameObject blood = Instantiate(bloodSpray, position, rotation) as GameObject;
+		blood.transform.parent = transform;
+		blood.transform.position = new Vector3(blood.transform.position.x, blood.transform.position.y, -1);
+
+		float gravity = blood.GetComponent<ParticleSystem>().gravityModifier;
+		blood.GetComponent<ParticleSystem>().gravityModifier = Random.Range(gravity - 1, gravity + 1);
+	}
+
 	public void DyingAnim()
 	{
 		anim.SetTrigger("die");
-		Quaternion rotation = bloodSpray.transform.rotation;
-		GameObject blood = Instantiate(bloodSpray, transform.position, rotation) as GameObject;
-		blood.transform.parent = transform;
-		blood.transform.position = new Vector3(blood.transform.position.x, blood.transform.position.y, -1);
+		CreateRandomBloodGush();
 	}
 
 	public void DestroyEntity()

@@ -59,6 +59,10 @@ public class SpawnMan : MonoBehaviour {
 
 	public void PopulateBoard()
 	{
+
+		for(int i=0; i<gridW; i++)
+			boardMan.InstantiateSingleEntity(npcsPool[0], new int[]{i, 7});
+		
 		for(int y=1; y<gridH; y++)
 		{
 			if(y==4 || y==6)
