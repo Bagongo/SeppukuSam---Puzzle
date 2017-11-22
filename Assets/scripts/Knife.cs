@@ -31,4 +31,32 @@ public class Knife : EntityBehavior {
 
 		hasHit = true;
 	}
+
+	public void StartPopUpAnim()
+	{
+		StartCoroutine(PopUpAnimation());
+    }
+
+	IEnumerator PopUpAnimation()
+	{
+		SpriteRenderer sptrRend = GetComponent<SpriteRenderer>();
+		sptrRend.sortingLayerName = "Forefront";
+		Color col = sprtRend.color;
+		float opacity = sprtRend.color.a;
+		Vector3 startPos = transform.position;
+		float scaleFactor = transform.localScale.x; 
+
+		while(opacity > 0.25f)
+		{
+			float newPosY = transform.position.y + 0.075f;
+			transform.position = new Vector3(transform.position.x, newPosY, transform.position.z);
+			scaleFactor += 0.05f;
+			transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+			opacity -= 0.03f;
+			sprtRend.color = new Color(col.r, col.g, col.g, opacity);
+			yield return null; 
+		}
+
+		Destroy(this.gameObject);	
+	}
 }

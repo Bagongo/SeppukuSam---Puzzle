@@ -93,6 +93,7 @@ public class EntityBehavior : MonoBehaviour {
 	public void EraseRemainingMoves()
 	{
 		turnMan.movesCleared += (nmbrOfMoves - movesCompleted);
+		turnMan.movesToDelete += (nmbrOfMoves - movesCompleted);
 		movesCompleted = 0;
 	}
 
@@ -193,6 +194,8 @@ public class EntityBehavior : MonoBehaviour {
 			Destroy(items[currentPos[0], currentPos[1]]);
 			items[currentPos[0], currentPos[1]] = null;
 			hasKnife = true;
+			GameObject animKnife = Instantiate(boardMan.knifePrefab, grid[currentPos[0], currentPos[1]].transform.position, Quaternion.identity) as GameObject;
+			animKnife.GetComponent<Knife>().StartPopUpAnim();			 
 		}
 	}
 
@@ -210,6 +213,10 @@ public class EntityBehavior : MonoBehaviour {
 		isMoving = true;
 
 		//speed =  SpeedModder(speedModifiers[0]/2, speedModifiers[1]/2) * 1.2f;
+
+		if(anim)
+			anim.SetBool("isMoving", isMoving);
+
 		StartCoroutine(SmoothMovement(newPos));
 	}
 

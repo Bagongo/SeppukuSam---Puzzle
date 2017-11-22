@@ -10,6 +10,7 @@ public class TurnMan : MonoBehaviour {
 	public int turnThreshold;
 	public int totalMovesToClear = 0;
 	public int movesCleared = 0;
+	public int movesToDelete = 0;
 
 	private int gridW;
 	private int gridH;
@@ -33,7 +34,6 @@ public class TurnMan : MonoBehaviour {
 	}
 
 	void Start () {
-
 		turnNmr = 1;
 		player = FindObjectOfType<PlayerBehavior>();					
 	}
@@ -94,12 +94,15 @@ public class TurnMan : MonoBehaviour {
 	IEnumerator CheckIfEntitiesFinishedMoving(bool endTurn)
 	{
 		while(movesCleared < totalMovesToClear)
-			yield return new WaitForSeconds(0.01f);
+		{
+			yield return new WaitForSeconds(0.1f);
+		}
 
 		StopCoroutine("CheckIfEntitiesFinishedMoving");
 
 		movesCleared = 0;
 		totalMovesToClear = 0;
+		movesToDelete = 0;
 
 		if(endTurn)
 			NextTurn();

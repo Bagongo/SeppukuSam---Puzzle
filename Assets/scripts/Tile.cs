@@ -11,7 +11,7 @@ public class Tile : MonoBehaviour {
 		boardMan = FindObjectOfType<BoardMan>();
 	}
 		
-	void OnMouseDown () {
+	void OnMouseDown() {
 
 			Debug.Log(transform.position.x + " " + transform.position.y);
 
