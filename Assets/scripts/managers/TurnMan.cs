@@ -124,6 +124,7 @@ public class TurnMan : MonoBehaviour {
 	{
 		turnNmr = 0;
 		levelMan.NextLevel();
+		spawnMan.PopulateBoard();
 	}
 
 	void CheckWaveClearance()

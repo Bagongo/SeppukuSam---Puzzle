@@ -59,19 +59,7 @@ public class SpawnMan : MonoBehaviour {
 
 	public void PopulateBoard()
 	{
-		//delete this thing....
-		for(int i=0; i<gridW; i++)
-		{
-			boardMan.InstantiateSingleEntity(npcsPool[0], new int[]{i, 7});
-		}
-		
-		for(int y=1; y<gridH; y++)
-		{
-			if(y==4 || y==6)
-				SpawnNpcsRow(y);
-			else if(y== gridH-1)
-				SpawnEnemyRow(y);			
-		}
+		SpawnNpcsRow(gridH - 1);
 	}
 
 	public void SpawnNpcsRow(int yPos)
